@@ -1,0 +1,33 @@
+assemble:
+    - from: build/static
+      into: static
+driver-add-form-reactjs:
+    friendlyURLMapping: driver-add-form-reactjs
+    htmlElementName: driver-add-form-reactjs
+    instanceable: false
+    name: Driver Add Form Reactjs
+    portletCategoryName: category.client-extensions
+    type: customElement
+    urls:
+        - index.*.js
+    useESM: true
+ui-components-demo:
+    friendlyURLMapping: ui-components-demo
+    htmlElementName: ui-components-demo
+    instanceable: false
+    name: UI Component
+    portletCategoryName: category.client-extensions
+    type: customElement
+    urls:
+        - index.*.js
+    useESM: true
+vehicle-add-form-reactjs:
+    friendlyURLMapping: vehicle-add-form-reactjs
+    htmlElementName: vehicle-add-form-reactjs
+    instanceable: false
+    name: Vehicle Add Form Reactjs
+    portletCategoryName: category.client-extensions
+    type: customElement
+    urls:
+        - index.*.js
+    useESM: true

@@ -1,0 +1,687 @@
+/* Main Container */
+.driver-add-form {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background: #f8f9fa;
+  min-height: 100vh;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+/* Form Header */
+.form-header {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.form-header h1 {
+  margin: 0 0 10px 0;
+  color: #2c3e50;
+  font-size: 28px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.form-header p {
+  margin: 0;
+  color: #6c757d;
+  font-size: 16px;
+}
+
+/* Form Sections Container */
+.form-sections-container {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+/* Form Section Cards */
+.form-section {
+  background-color: #fff;
+  padding: 25px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+/* Section Headers */
+.section-title {
+  margin: 0 0 20px 0;
+  color: #2c3e50;
+  font-size: 20px;
+  font-weight: 600;
+  padding: 8px 0 8px 16px;
+  border-inline-start: 4px solid #007bff;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+}
+
+/* Section-specific colored borders */
+.user-section {
+  border-inline-start-color: #007bff;
+  background-color: rgba(0, 123, 255, 0.05);
+}
+
+.phone-section {
+  border-inline-start-color: #28a745;
+  background-color: rgba(40, 167, 69, 0.05);
+}
+
+.license-section {
+  border-inline-start-color: #ffc107;
+  background-color: rgba(255, 193, 7, 0.05);
+}
+
+.settings-section {
+  border-inline-start-color: #6f42c1;
+  background-color: rgba(111, 66, 193, 0.05);
+}
+
+.attachment-section {
+  border-inline-start-color: #dc3545;
+  background-color: rgba(220, 53, 69, 0.05);
+}
+
+/* Submit Button Container */
+.form-submit-container {
+  margin-top: 30px;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.submit-button {
+  padding: 12px 40px;
+  font-size: 16px;
+  font-weight: 600;
+  border-radius: 6px;
+  min-width: 200px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 auto;
+}
+
+/* Back Button */
+.back-button-container {
+  margin-bottom: 20px;
+}
+
+.back-button-container button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  border: 1px solid #dee2e6;
+  background-color: #fff;
+  color: #495057;
+  font-weight: 500;
+}
+
+/* Back Button */
+.back-button-container {
+  margin-bottom: 24px;
+}
+
+
+/* Form Sections - Single Card */
+.form-sections-container {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin-bottom: 20px;
+}
+
+.form-section {
+  display: block;
+  padding: 0;
+  margin-bottom: 0;
+  background: transparent;
+  border: none;
+  box-shadow: none;
+  position: relative;
+}
+
+/* Section Dividers */
+.form-section + .form-section {
+  border-top: 1px solid #e0e0e0;
+  margin-top: 30px;
+  padding-top: 30px;
+}
+
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Section Titles with Icons */
+.section-title {
+  color: #333;
+  font-size: 20px;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  border-bottom: 2px solid #e0e0e0;
+  position: relative;
+
+}
+
+.section-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 30px;
+  height: 30px;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Section-specific icons */
+.user-section::before {
+  content: '👤';
+  font-size: 24px;
+  width: auto;
+  height: auto;
+  background: none;
+}
+
+.phone-section::before {
+  content: '📞';
+  font-size: 24px;
+  width: auto;
+  height: auto;
+  background: none;
+}
+
+.license-section::before {
+  content: '🪪';
+  font-size: 24px;
+  width: auto;
+  height: auto;
+  background: none;
+}
+
+.settings-section::before {
+  content: '⚙️';
+  font-size: 24px;
+  width: auto;
+  height: auto;
+  background: none;
+}
+
+.attachment-section::before {
+  content: '📎';
+  font-size: 24px;
+  width: auto;
+  height: auto;
+  background: none;
+}
+
+.system-fields-section::before {
+  content: '🔧';
+  font-size: 24px;
+  width: auto;
+  height: auto;
+  background: none;
+}
+
+.form-section h4 {
+  color: #555;
+  font-size: 16px;
+  font-weight: 600;
+  margin: 25px 0 15px 0;
+  padding: 0;
+  border-left: 3px solid #007bff;
+  padding-left: 15px;
+}
+
+/* Form Grid - Basic Two Column Layout */
+.form-grid {
+  display: grid;
+  gap: 20px;
+  align-items: start;
+}
+
+.form-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.full-row {
+  grid-column: 1 / -1;
+}
+
+/* Form Groups - Basic Style */
+.form-grid .clay-form-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 0;
+}
+
+.form-grid label {
+  display: block;
+  color: #333;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+
+
+.form-grid input[type="text"],
+.form-grid input[type="email"],
+.form-grid input[type="date"],
+.form-grid input[type="file"],
+.form-grid textarea,
+.form-grid select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.form-grid input:focus,
+.form-grid textarea:focus,
+.form-grid select:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.form-grid textarea {
+  resize: vertical;
+  min-height: 100px;
+}
+
+
+
+
+/* Form Errors - Basic Style */
+.form-error {
+  color: #dc3545;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}
+
+.has-error {
+  border-color: #dc3545 !important;
+}
+
+.has-error:focus {
+  border-color: #dc3545 !important;
+  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
+}
+
+/* File Input - Basic Style */
+input[type="file"] {
+  padding: 8px !important;
+  background: white !important;
+  border: 1px solid #ddd !important;
+  cursor: pointer;
+}
+
+/* Submit Button Container */
+.form-submit-container {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.submit-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  border-radius: 4px;
+  background: #007bff;
+  color: white;
+  border: 1px solid #007bff;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.submit-button:hover:not(:disabled) {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.spinning {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.form-submit-container button[type="submit"] {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px 56px;
+  font-size: 18px;
+  font-weight: 700;
+  border: none;
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 
+    0 12px 30px rgba(102, 126, 234, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  position: relative;
+  overflow: hidden;
+  min-width: 280px;
+}
+
+.form-submit-container button[type="submit"]::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  transition: left 0.6s ease;
+}
+
+.form-submit-container button[type="submit"]:hover:not(:disabled) {
+  transform: translateY(-3px);
+  box-shadow: 
+    0 16px 40px rgba(102, 126, 234, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.2);
+}
+
+.form-submit-container button[type="submit"]:hover:not(:disabled)::before {
+  left: 100%;
+}
+
+.form-submit-container button[type="submit"]:active:not(:disabled) {
+  transform: translateY(-1px);
+}
+
+.form-submit-container button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+}
+
+/* Loading State */
+.form-submit-container button[type="submit"]:disabled::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* React Select - Basic Style */
+.css-control {
+  border-radius: 4px !important;
+  border: 1px solid #ddd !important;
+  background: white !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.css-control:hover {
+  border-color: #ccc !important;
+}
+
+.css-control--is-focused {
+  border-color: rgb(122, 65, 247) !important;
+  box-shadow: 0 0 0 3px rgba(122, 65, 247, 0.1) !important;
+}
+
+/* Select Focus Styles - Global */
+.css-control:focus,
+.css-control:focus-within {
+  border-color: rgb(122, 65, 247) !important;
+  background: white !important;
+  box-shadow: 0 0 0 3px rgba(122, 65, 247, 0.1) !important;
+}
+
+/* Select SVG Icons Color on Focus */
+.css-control--is-focused .css-dropdown-indicator,
+.css-control--is-focused .css-clear-indicator,
+.css-control:focus .css-dropdown-indicator,
+.css-control:focus .css-clear-indicator,
+.css-control:focus-within .css-dropdown-indicator,
+.css-control:focus-within .css-clear-indicator {
+  display: inline-block !important;
+  fill: rgb(122, 65, 247) !important;
+  line-height: 1 !important;
+  stroke: rgb(122, 65, 247) !important;
+  stroke-width: 0 !important;
+  color: rgb(122, 65, 247) !important;
+}
+
+/* Select SVG Icons Color on Focus - Alternative selectors */
+.css-control--is-focused svg,
+.css-control:focus svg,
+.css-control:focus-within svg {
+  display: inline-block !important;
+  fill: rgb(122, 65, 247) !important;
+  line-height: 1 !important;
+  stroke: rgb(122, 65, 247) !important;
+  stroke-width: 0 !important;
+  color: rgb(122, 65, 247) !important;
+}
+
+.css-value-container {
+  padding: 8px 12px !important;
+}
+
+.css-input {
+  font-size: 14px !important;
+}
+
+.css-placeholder {
+  color: #999 !important;
+  font-size: 14px !important;
+}
+
+.css-single-value {
+  color: #333 !important;
+  font-size: 14px !important;
+}
+
+.css-indicator-separator {
+  background-color: #ddd !important;
+}
+
+.css-dropdown-indicator {
+  color: #666 !important;
+}
+
+.css-clear-indicator {
+  color: #666 !important;
+}
+
+/* Read-only Fields - Basic Style */
+input[readonly] {
+  background: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+  border-color: #dee2e6 !important;
+}
+
+/* Date Input with Icon */
+.date-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.date-input {
+  width: 100%;
+  padding: 10px 40px 10px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background: white;
+  transition: border-color 0.2s ease;
+}
+
+.date-input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.date-icon {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #666;
+  pointer-events: none;
+}
+
+/* Responsive Design - Mobile First */
+@media (max-width: 768px) {
+  .form-sections-container {
+    padding: 20px;
+  }
+
+  .form-grid-2 {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .section-title {
+    font-size: 18px;
+    padding-left: 35px;
+  }
+
+  .section-title::before {
+    width: 25px;
+    height: 25px;
+  }
+
+  .form-grid .full-row {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-grid label:has(input[type="radio"]) {
+    min-height: 44px;
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 576px) {
+  .driver-add-form {
+    padding: 10px;
+  }
+
+  .form-sections-container {
+    padding: 15px;
+  }
+
+  .section-title {
+    font-size: 16px;
+    padding-left: 30px;
+  }
+
+  .section-title::before {
+    width: 20px;
+    height: 20px;
+    font-size: 18px;
+  }
+
+  .submit-button {
+    width: 100%;
+    padding: 12px 20px;
+  }
+
+  .date-icon {
+    font-size: 14px;
+  }
+}
+
+/* Accessibility Improvements */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Focus Visible for Keyboard Navigation */
+*:focus-visible {
+  outline: 3px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Print Styles */
+@media print {
+  .section-nav,
+  .back-button-container,
+  .form-submit-container {
+    display: none;
+  }
+
+  .form-section {
+    display: block !important;
+    page-break-inside: avoid;
+    box-shadow: none;
+    border: 1px solid #ddd;
+  }
+}
