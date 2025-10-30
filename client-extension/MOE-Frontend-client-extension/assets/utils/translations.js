@@ -311,6 +311,10 @@ export const translations = {
     // Vehicle Success/Error Messages
     vehicleCreatedSuccess: 'Vehicle has been successfully created!',
     vehicleUpdatedSuccess:'Vehicle has been successfully updated!',
+    updateVehicle: 'Update Vehicle',
+    saveAsDraft: 'Save as Draft',
+    savedAsDraft: 'Saved as draft',
+    fileTitleExists: 'A file with this title already exists. Please rename and try again.',
     failedToCreateVehicle: 'Failed to create vehicle',
     failedToLoadData: 'Failed to load some data',
     failedToLoadDrivers: 'Failed to load drivers',
@@ -646,6 +650,10 @@ export const translations = {
     // Vehicle Success/Error Messages
     vehicleCreatedSuccess: 'تم إنشاء المركبة بنجاح!',
     vehicleUpdatedSuccess: 'تم تعديل المركبة بنجاح!',
+    updateVehicle: 'تعديل مركبة',
+    saveAsDraft: 'حفظ كمسودة',
+    savedAsDraft: 'تم الحفظ كمسودة',
+    fileTitleExists: 'يوجد ملف بنفس الاسم. يرجى إعادة التسمية والمحاولة مرة أخرى.',
     failedToCreateVehicle: 'فشل في إنشاء المركبة',
     failedToLoadData: 'فشل في تحميل بعض البيانات',
     failedToLoadDrivers: 'فشل في تحميل السائقين',

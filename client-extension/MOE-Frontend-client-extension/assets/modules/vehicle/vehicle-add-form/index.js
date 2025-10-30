@@ -633,11 +633,11 @@ const VehicleAddForm = () => {
 
             if (!uploadResponse.ok) {
                 if (uploadResponse.status === 409) {
-                    toast.error("A file with this title already exists. Please rename and try again.");
+                    toast.error(t("fileTitleExists") || "A file with this title already exists. Please rename and try again.");
                 } else {
                     const errorData = await uploadResponse.json();
                     console.error("Upload failed:", errorData);
-                    const errorMessage = errorData.title || errorData.message || "File upload failed";
+                    const errorMessage = errorData.title || errorData.message || t("fileUploadFailed") || "File upload failed";
                     toast.error(errorMessage);
                 }
                 throw new Error('File upload failed');
@@ -798,7 +798,7 @@ const VehicleAddForm = () => {
                 throw new Error(errorData.title);
             }
 
-            toast.success(isEditMode ? t("vehicleUpdatedSuccess") || "Vehicle updated successfully" : t("vehicleCreatedSuccess"));
+            toast.success(isEditMode ? t("vehicleUpdatedSuccess") : t("vehicleCreatedSuccess"));
             if (!isEditMode) {
                 setFormData(initialFormData);
                 setErrors({});
@@ -847,7 +847,7 @@ const VehicleAddForm = () => {
                 throw new Error(errorData.title);
             }
 
-            toast.success("Saved as draft");
+            toast.success(t("savedAsDraft") || "Saved as draft");
             setShowSuccessPopup(false);
             setIsLoading(false);
             // Do not reset the form so the user can continue editing if they want
@@ -876,6 +876,7 @@ const VehicleAddForm = () => {
                     t={t}
                     spritemap={spritemap}
                     setFormData={setFormData}
+                    isEditMode={isEditMode}
                 />
             ),
         },
@@ -950,7 +951,7 @@ const VehicleAddForm = () => {
                 <form onSubmit={(e) => e.preventDefault()}>
                     <div className="form-container">
                         <div className="form-header">
-                            <h1>{isEditMode ? t("updateVehicle") || "Update Vehicle" : t("addNewVehicle")}</h1>
+                            <h1>{isEditMode ? t("updateVehicle") : t("addNewVehicle")}</h1>
                         </div>
                         <MultiStepNav steps={steps} currentStep={currentStep} onStepChange={(step) => setCurrentStep(step)} spritemap={spritemap} />
                         <div className="form-wrapper-steps-content mt-5">{steps[currentStep].content}</div>
@@ -988,7 +989,7 @@ const VehicleAddForm = () => {
                             {currentStep === steps.length - 1 && (
                                 <>
                                     <button onClick={handleSaveDraft} disabled={isLoading} className="btn-style btn-main-primary-outline">
-                                        {"Save as Draft"}
+                                        {t("saveAsDraft") || "Save as Draft"}
                                     </button>
                                     <button onClick={handleSubmit} disabled={isLoading} className="btn-style btn-main-primary">
                                         {isLoading ? t("submitting") : t("submit")}

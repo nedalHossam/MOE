@@ -4,7 +4,7 @@ import ClayIcon from "@clayui/icon";
 import { TextInput, SelectComponent } from "../../../../components/ui";
 import { useTranslation } from "../../../../utils/translations";
 
-const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoading, setField, t, spritemap, setFormData }) => {
+const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoading, setField, t, spritemap, setFormData, isEditMode }) => {
     const { currentLanguage } = useTranslation();
     
     // Helper to find option by value and return its i18n data
@@ -95,6 +95,7 @@ const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoadin
                     name="vin"
                     value={formData.vin}
                     onChange={(e) => setField("vin", e.target.value)}
+                    readOnly={!!isEditMode}
                     error={!!errors.vin}
                     errorMessage={errors.vin}
                     errorIcon="exclamation-full"
