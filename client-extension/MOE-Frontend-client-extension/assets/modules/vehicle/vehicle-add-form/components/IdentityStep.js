@@ -65,7 +65,14 @@ const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoadin
                         value={formData.vehicleStatus}
                         onChange={(value) => handleSelectChangeWithI18n("vehicleStatus", value)}
                         isLoading={optionsLoading}
-                        isDisabled={true}
+                        isDisabled={
+                            optionsLoading ||
+                            isLoading ||
+                            !(
+                                isEditMode &&
+                                String(formData.vehicleStatus || "").toLowerCase() === "draft"
+                            )
+                        }
                         placeholder={t("statusPlaceholder")}
                         isMulti={false}
                         currentLanguage={currentLanguage}

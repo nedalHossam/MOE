@@ -949,9 +949,11 @@ const VehicleAddForm = () => {
                             )}
                             {currentStep === steps.length - 1 && (
                                 <>
-                                    <button onClick={handleSaveDraft} disabled={isLoading} className="btn-style btn-main-primary-outline">
-                                        {t("saveAsDraft") || "Save as Draft"}
-                                    </button>
+                                    {!isEditMode && (
+                                        <button onClick={handleSaveDraft} disabled={isLoading} className="btn-style btn-main-primary-outline">
+                                            {t("saveAsDraft") || "Save as Draft"}
+                                        </button>
+                                    )}
                                     <button onClick={handleSubmit} disabled={isLoading} className="btn-style btn-main-primary">
                                         {isLoading ? t("submitting") : t("submit")}
                                     </button>
