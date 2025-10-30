@@ -102,6 +102,7 @@ const OwnershipStep = ({ formData, errors, picklistData, setField, t, spritemap,
                             spritemap={spritemap}
                             placeholder={t("moeContractNumberPlaceholder")}
                             required={true}
+                            className="mt-2"
                         />
 
                         <TextInput
@@ -138,6 +139,7 @@ const OwnershipStep = ({ formData, errors, picklistData, setField, t, spritemap,
                             min={0}
                             step="0.01"
                             required={true}
+                            className="mt-2"
                         />
                     </>
                 )}
@@ -167,6 +169,7 @@ const OwnershipStep = ({ formData, errors, picklistData, setField, t, spritemap,
                                 spritemap={spritemap}
                                 placeholder={t("vendorContractNumberPlaceholder")}
                                 required={true}
+                                className="mt-2"
                             />
 
                             <TextInput
@@ -180,6 +183,7 @@ const OwnershipStep = ({ formData, errors, picklistData, setField, t, spritemap,
                                 spritemap={spritemap}
                                 placeholder={t("vendorsContactPersonPlaceholder")}
                                 required={true}
+                                className="mt-2"
                             />
 
                             <TextInput

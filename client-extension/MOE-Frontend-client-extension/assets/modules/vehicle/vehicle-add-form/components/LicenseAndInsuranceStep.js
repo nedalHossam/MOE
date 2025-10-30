@@ -22,6 +22,10 @@ const LicenseAndInsuranceStep = ({ formData, errors, picklistData, optionsLoadin
             selectedOption = getOptionWithI18n(picklistData.insurancePolicyType, value);
         } else if (fieldName === "insuranceCompany") {
             selectedOption = getOptionWithI18n(picklistData.insuranceCompanies, value);
+        } else if (fieldName === "licenseStatus") {
+            selectedOption = getOptionWithI18n(picklistData.licenseStatus, value);
+        } else if (fieldName === "insuranceStatus") {
+            selectedOption = getOptionWithI18n(picklistData.insuranceStatus, value);
         }
 
         // Set the key value
@@ -103,23 +107,49 @@ const LicenseAndInsuranceStep = ({ formData, errors, picklistData, optionsLoadin
                     min={0}
                 />
 
-                <TextInput
-                    label={t("licenseStatus")}
-                    name="licenseStatus"
-                    value={formData.licenseStatus || t("valid")}
-                    disabled={true}
-                    placeholder={t("licenseStatusPlaceholder")}
-                    required={true}
-                />
+                <ClayForm.Group>
+                    <label className="form-label">
+                        {t("licenseStatus")} <span className="required-asterisk">*</span>
+                    </label>
+                    <SelectComponent
+                        options={picklistData.licenseStatus}
+                        value={formData.licenseStatus}
+                        onChange={(value) => handleSelectChangeWithI18n("licenseStatus", value)}
+                        isLoading={optionsLoading}
+                        isDisabled={true}
+                        placeholder={t("licenseStatusPlaceholder")}
+                        isMulti={false}
+                        currentLanguage={currentLanguage}
+                    />
+                    {errors.licenseStatus && (
+                        <div className="form-error">
+                            <ClayIcon symbol="exclamation-full" className="error-icon" spritemap={spritemap} />
+                            {errors.licenseStatus}
+                        </div>
+                    )}
+                </ClayForm.Group>
 
-                <TextInput
-                    label={t("insuranceStatus")}
-                    name="insuranceStatus"
-                    value={formData.insuranceStatus || t("valid")}
-                    disabled={true}
-                    placeholder={t("insuranceStatusPlaceholder")}
-                    required={true}
-                />
+                <ClayForm.Group>
+                    <label className="form-label">
+                        {t("insuranceStatus")} <span className="required-asterisk">*</span>
+                    </label>
+                    <SelectComponent
+                        options={picklistData.insuranceStatus}
+                        value={formData.insuranceStatus}
+                        onChange={(value) => handleSelectChangeWithI18n("insuranceStatus", value)}
+                        isLoading={optionsLoading}
+                        isDisabled={true}
+                        placeholder={t("insuranceStatusPlaceholder")}
+                        isMulti={false}
+                        currentLanguage={currentLanguage}
+                    />
+                    {errors.insuranceStatus && (
+                        <div className="form-error">
+                            <ClayIcon symbol="exclamation-full" className="error-icon" spritemap={spritemap} />
+                            {errors.insuranceStatus}
+                        </div>
+                    )}
+                </ClayForm.Group>
 
                 <TextInput
                     label={t("registrationNumber")}
@@ -149,7 +179,6 @@ const LicenseAndInsuranceStep = ({ formData, errors, picklistData, optionsLoadin
                             end: 2050,
                             start: new Date().getFullYear(),
                         }}
-                        minDate={new Date(Date.now() + 24 * 60 * 60 * 1000)}
                     />
                     {errors.registrationExpiryDate && (
                         <div className="form-error">
@@ -231,7 +260,6 @@ const LicenseAndInsuranceStep = ({ formData, errors, picklistData, optionsLoadin
                             end: 2050,
                             start: new Date().getFullYear(),
                         }}
-                        minDate={new Date(Date.now() + 24 * 60 * 60 * 1000)}
                     />
                     {errors.insuranceExpiryDate && (
                         <div className="form-error">

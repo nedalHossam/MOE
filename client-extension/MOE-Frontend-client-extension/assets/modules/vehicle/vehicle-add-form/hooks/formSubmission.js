@@ -73,6 +73,18 @@ export const buildApiPayload = (formData, isDraft = false) => {
         apiData.attachments = formData.attachments.id;
     }
 
+    // Attachment description with localization
+    if (formData.attachmentDescription || (formData.attachmentDescription_i18n && Object.keys(formData.attachmentDescription_i18n).length > 0)) {
+        // Send the localized description
+        if (formData.attachmentDescription_i18n && Object.keys(formData.attachmentDescription_i18n).length > 0) {
+            apiData.attachmentDescription_i18n = formData.attachmentDescription_i18n;
+        }
+        // Also send the simple description value if available
+        if (formData.attachmentDescription) {
+            apiData.attachmentDescription = formData.attachmentDescription;
+        }
+    }
+
     return apiData;
 };
 

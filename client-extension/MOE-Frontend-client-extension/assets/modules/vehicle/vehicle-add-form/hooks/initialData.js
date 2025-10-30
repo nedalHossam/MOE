@@ -28,9 +28,9 @@ export const createInitialFormData = (t) => {
         // Section B: License and insurance
         licensedCapacitySeats: "",
         licensedCapacityKg: "",
-        licenseStatus: t("valid"), // Read-only, computed
+        licenseStatus: "Valid", // Default: Valid, can be manually edited
         licenseStatus_i18n: {},
-        insuranceStatus: t("valid"), // Read-only, computed
+        insuranceStatus: "Valid", // Default: Valid, can be manually edited
         insuranceStatus_i18n: {},
         registrationNumber: "",
         registrationExpiryDate: "",

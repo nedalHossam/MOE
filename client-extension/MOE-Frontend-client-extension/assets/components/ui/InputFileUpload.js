@@ -8,10 +8,16 @@ const InputFileUpload = ({
   name, 
   accept = "image/*",
   placeholder = "المرفق",
-  className = ""
+  className = "",
+  value = null // Accept value prop for uploaded file name
 }) => {
-  const [fileName, setFileName] = useState('');
+  const [fileName, setFileName] = useState(value || '');
   const fileInputRef = useRef();
+
+  // Update fileName when value prop changes
+  React.useEffect(() => {
+    setFileName(value || '');
+  }, [value]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];

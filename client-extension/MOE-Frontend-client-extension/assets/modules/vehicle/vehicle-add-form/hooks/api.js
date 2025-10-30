@@ -169,3 +169,24 @@ export const fetchUserRoles = async (userId) => {
         return [];
     }
 };
+
+export const getVehicleById = async (vehicleId) => {
+    try {
+        if (!vehicleId) {
+            console.warn("Vehicle ID is required");
+            return null;
+        }
+
+        const response = await api(`o/c/vehicles/${vehicleId}`);
+
+        if (!response.ok) {
+            throw new Error("Failed to fetch vehicle");
+        }
+
+        const vehicleData = await response.json();
+        return vehicleData;
+    } catch (error) {
+        console.error("Error fetching vehicle by ID:", error);
+        return null;
+    }
+};

@@ -12,7 +12,7 @@ import { SuccessPopup } from "../../../components/ui";
 import vectorImage from "../../../static/images/Vector.svg";
 
 // Import utilities
-import { api, fetchPicklistOptions, getPicklistOptions, fetchAllUsers, fetchDriverDataList, fetchCurrentUser, fetchUserRoles } from "./hooks/api";
+import { api, fetchPicklistOptions, getPicklistOptions, fetchAllUsers, fetchDriverDataList, fetchCurrentUser, fetchUserRoles, getVehicleById } from "./hooks/api";
 
 import {
     validateField,
@@ -41,6 +41,149 @@ import AttachmentsStep from "./components/AttachmentsStep";
 // Helper function to get locale object by symbol
 const getLocaleObject = (symbol) => {
     return locales.find((loc) => loc.symbol === symbol) || locales[0];
+};
+
+/**
+ * Maps API vehicle data to form data structure
+ * @param {Object} vehicleData - The vehicle data from API
+ * @returns {Object} Form data object
+ */
+const mapVehicleDataToFormData = (vehicleData) => {
+    const formData = {};
+
+    // Helper to extract key from object or i18n structure
+    const getKey = (fieldName) => {
+        if (vehicleData[fieldName]?.key) {
+            return vehicleData[fieldName].key;
+        }
+        if (vehicleData[`${fieldName}_i18n`]) {
+            const i18n = vehicleData[`${fieldName}_i18n`];
+            const firstLocale = Object.keys(i18n)[0];
+            return i18n[firstLocale]?.key || i18n[firstLocale];
+        }
+        return vehicleData[fieldName] || "";
+    };
+
+    // Helper to get i18n object
+    const getI18n = (fieldName) => {
+        return vehicleData[`${fieldName}_i18n`] || {};
+    };
+
+    // Helper to format date from ISO string to YYYY-MM-DD format
+    const formatDate = (dateString) => {
+        if (!dateString) return "";
+        try {
+            // If it's already in YYYY-MM-DD format, return as is
+            if (typeof dateString === "string" && dateString.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                return dateString;
+            }
+            // Parse ISO string and extract date part
+            const date = new Date(dateString);
+            if (isNaN(date.getTime())) return "";
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, "0");
+            const day = String(date.getDate()).padStart(2, "0");
+            return `${year}-${month}-${day}`;
+        } catch (error) {
+            console.error("Error formatting date:", error);
+            return "";
+        }
+    };
+
+    // Section A: Identity
+    formData.vehicleStatus = getKey("vehicleStatus");
+    formData.vehicleStatus_i18n = getI18n("vehicleStatus");
+    formData.plateNumber = vehicleData.plateNumber || "";
+    formData.vin = vehicleData.vin || "";
+    formData.carBrand = getKey("carBrand");
+    formData.carBrand_i18n = getI18n("carBrand");
+    formData.carModel = vehicleData.carModel?.key || "";
+    formData.carModel_i18n = vehicleData.carModel_i18n || {};
+    // Convert carYear to string (API returns number, form expects string)
+    formData.carYear = vehicleData.carYear != null ? String(vehicleData.carYear) : "";
+    formData.color = getKey("carColor");
+    formData.color_i18n = getI18n("carColor");
+    formData.carCategory = getKey("carCategory");
+    formData.carCategory_i18n = getI18n("carCategory");
+    formData.carClassification = vehicleData.carClassification?.key || "";
+    formData.carClassification_i18n = vehicleData.carClassification_i18n || {};
+
+    // Section B: License and insurance
+    // Convert numeric fields to strings (API returns numbers, form expects strings)
+    formData.licensedCapacitySeats = vehicleData.licensedCapacitySeats != null ? String(vehicleData.licensedCapacitySeats) : "";
+    formData.licensedCapacityKg = vehicleData.licensedCapacityKg != null ? String(vehicleData.licensedCapacityKg) : "";
+    formData.licenseStatus = vehicleData.licenseStatus?.key || "";
+    formData.licenseStatus_i18n = getI18n("licenseStatus");
+    formData.insuranceStatus = vehicleData.insuranceStatus?.key || "";
+    formData.insuranceStatus_i18n = getI18n("insuranceStatus");
+    // Registration number might be in i18n format
+    if (vehicleData.registrationNumber_i18n) {
+        const firstLocale = Object.keys(vehicleData.registrationNumber_i18n)[0];
+        formData.registrationNumber = vehicleData.registrationNumber_i18n[firstLocale] || vehicleData.registrationNumber || "";
+    } else {
+        formData.registrationNumber = vehicleData.registrationNumber || "";
+    }
+    // Format dates to YYYY-MM-DD (remove time portion)
+    formData.registrationExpiryDate = formatDate(vehicleData.registrationExpiryDate);
+    formData.insurancePolicyType = getKey("insurancePolicyType");
+    formData.insurancePolicyType_i18n = getI18n("insurancePolicyType");
+    formData.insurancePolicyNumber = vehicleData.insurancePolicyNumber || "";
+    formData.insuranceCompany = getKey("insuranceCompany");
+    formData.insuranceCompany_i18n = getI18n("insuranceCompany");
+    formData.insuranceExpiryDate = formatDate(vehicleData.insuranceExpiryDate);
+
+    // Section C: Ownership
+    formData.ownershipType = vehicleData.ownershipType?.key || "";
+    formData.ownershipType_i18n = getI18n("ownershipType");
+    formData.moeContractNumber = vehicleData.moeContractNumber || "";
+    // Convert numeric fields to strings (API returns numbers, form expects strings)
+    formData.carValueMOE = vehicleData.carValueMoe != null ? String(vehicleData.carValueMoe) : "";
+    formData.vendorContractNumber = vehicleData.vendorContractNumber || "";
+    formData.vendorsContactPerson = vehicleData.vendorsContactPerson || "";
+    formData.vendorsContactDetails = vehicleData.vendorsContactDetails || "";
+    formData.vendorYearlyValue = vehicleData.vendorYearlyValue != null ? String(vehicleData.vendorYearlyValue) : "";
+    formData.contractIncludesGas = vehicleData.contractIncludesGas ? "Yes" : "No";
+    formData.contractIncludesGas_i18n = vehicleData.contractIncludesGas_i18n || {};
+
+    // Section D: Operational info
+    formData.fuelType = getKey("fuelType");
+    formData.fuelType_i18n = getI18n("fuelType");
+    formData.telemetryID = vehicleData.telemetryID || "";
+    formData.fuelCardDeviceNumber = vehicleData.fuelCardDeviceNumber || "";
+    formData.carLocationHome = getKey("carLocationHome");
+    formData.carLocationHome_i18n = getI18n("carLocationHome");
+    formData.currentLocation = getKey("currentLocation");
+    formData.currentLocation_i18n = getI18n("currentLocation");
+    // Convert numeric fields to strings (API returns numbers, form expects strings)
+    formData.startingKM = vehicleData.startingKM != null ? String(vehicleData.startingKM) : "";
+    formData.currentKM = vehicleData.currentKM != null ? String(vehicleData.currentKM) : "";
+    formData.monthlyKMLimit = vehicleData.monthlyKMLimit != null ? String(vehicleData.monthlyKMLimit) : "";
+    formData.monthlyGasLimit = vehicleData.monthlyGasLimit != null ? String(vehicleData.monthlyGasLimit) : "";
+    
+    // Drivers - convert ID to array format matching form structure
+    if (vehicleData.r_drivers_c_driverId) {
+        formData.r_drivers_c_driverId = [{ value: vehicleData.r_drivers_c_driverId }];
+    } else {
+        formData.r_drivers_c_driverId = [];
+    }
+    
+    // Keep as number to match select option values (administrations have numeric value: user.id)
+    formData.preferredAdministration = vehicleData.r_preferredAdministration_userId != null ? vehicleData.r_preferredAdministration_userId : "";
+    if (vehicleData.r_preferredMoeEmployee_userId) {
+        formData.preferredMOEEmployee = [{ value: vehicleData.r_preferredMoeEmployee_userId }];
+    } else {
+        formData.preferredMOEEmployee = [];
+    }
+    
+    formData.department = getKey("department");
+    formData.department_i18n = getI18n("department");
+
+    // Attachments
+    formData.attachments = vehicleData.attachments || null;
+    formData.attachmentDescription = vehicleData.attachmentDescription || "";
+    formData.attachmentDescription_i18n = getI18n("attachmentDescription");
+
+    return formData;
 };
 
 const VehicleAddForm = () => {
@@ -101,6 +244,8 @@ const VehicleAddForm = () => {
     const [fileList, setFileList] = useState([]);
     const [userRoles, setUserRoles] = useState([]);
     const [currentUser, setCurrentUser] = useState(null);
+    const [vehicleId, setVehicleId] = useState(null);
+    const [isEditMode, setIsEditMode] = useState(false);
 
     // Check if current user has Director role
     const isDirector = useMemo(() => {
@@ -113,6 +258,10 @@ const VehicleAddForm = () => {
         const fetchAllData = async () => {
             try {
                 setOptionsLoading(true);
+
+                // Get editVehicleId from URL query parameters
+                const urlParams = new URLSearchParams(window.location.search);
+                const editVehicleId = urlParams.get("editVehicleId");
 
                 // First fetch current user to get department for filtering
                 const currentUserData = await fetchCurrentUser();
@@ -246,6 +395,26 @@ const VehicleAddForm = () => {
                         }));
                     }
                 }
+
+                // After picklists are loaded, fetch and populate vehicle data if editing
+                if (editVehicleId) {
+                    setIsEditMode(true);
+                    setVehicleId(editVehicleId);
+                    
+                    const vehicleData = await getVehicleById(editVehicleId);
+                    if (vehicleData) {
+                        // Map vehicle data to form data structure
+                        const mappedFormData = mapVehicleDataToFormData(vehicleData);
+                        
+                        // Update form data with mapped vehicle data
+                        setFormData((prev) => ({
+                            ...prev,
+                            ...mappedFormData,
+                        }));
+                        
+                        console.log("Vehicle data loaded and populated:", vehicleData);
+                    }
+                }
             } catch (error) {
                 console.error("Error fetching data:", error);
                 toast.error(t("failedToLoadData"));
@@ -282,20 +451,38 @@ const VehicleAddForm = () => {
 
             // Compute license status when registration expiry changes
             if (field === "registrationExpiryDate") {
-                updated.licenseStatus = computeLicenseStatus(processedValue, t);
-                updated.licenseStatus_i18n = {
-                    ...updated.licenseStatus_i18n,
-                    [localizedInputLocales.licenseStatus]: computeLicenseStatus(processedValue, t),
-                };
+                const computedStatus = computeLicenseStatus(processedValue, t);
+                updated.licenseStatus = computedStatus;
+                // Update i18n fields for the computed status
+                const statusOption = picklistData.licenseStatus.find(opt => opt.value === computedStatus);
+                if (statusOption && statusOption.name_i18n) {
+                    const i18nData = {};
+                    if (statusOption.name_i18n['en_US'] || statusOption.name_i18n['en-US']) {
+                        i18nData['en_US'] = statusOption.name_i18n['en_US'] || statusOption.name_i18n['en-US'];
+                    }
+                    if (statusOption.name_i18n['ar_SA'] || statusOption.name_i18n['ar-SA']) {
+                        i18nData['ar_SA'] = statusOption.name_i18n['ar_SA'] || statusOption.name_i18n['ar-SA'];
+                    }
+                    updated.licenseStatus_i18n = i18nData;
+                }
             }
 
             // Compute insurance status when insurance expiry changes
             if (field === "insuranceExpiryDate") {
-                updated.insuranceStatus = computeInsuranceStatus(processedValue, t);
-                updated.insuranceStatus_i18n = {
-                    ...updated.insuranceStatus_i18n,
-                    [localizedInputLocales.insuranceStatus]: computeInsuranceStatus(processedValue, t),
-                };
+                const computedStatus = computeInsuranceStatus(processedValue, t);
+                updated.insuranceStatus = computedStatus;
+                // Update i18n fields for the computed status
+                const statusOption = picklistData.insuranceStatus.find(opt => opt.value === computedStatus);
+                if (statusOption && statusOption.name_i18n) {
+                    const i18nData = {};
+                    if (statusOption.name_i18n['en_US'] || statusOption.name_i18n['en-US']) {
+                        i18nData['en_US'] = statusOption.name_i18n['en_US'] || statusOption.name_i18n['en-US'];
+                    }
+                    if (statusOption.name_i18n['ar_SA'] || statusOption.name_i18n['ar-SA']) {
+                        i18nData['ar_SA'] = statusOption.name_i18n['ar_SA'] || statusOption.name_i18n['ar-SA'];
+                    }
+                    updated.insuranceStatus_i18n = i18nData;
+                }
             }
 
             // Update ownershipType_i18n when ownershipType changes
@@ -565,6 +752,14 @@ const VehicleAddForm = () => {
         setIsLoading(true);
 
         try {
+            // Check Liferay session before submitting
+            const sessionUser = await fetchCurrentUser();
+            if (!sessionUser) {
+                toast.error(t("sessionExpired") || "Your session has expired. Please sign in again.");
+                setIsLoading(false);
+                return;
+            }
+
             // Validate all sections
             if (!validateAllSections(formData, picklistData, t, isDirector)) {
                 toast.error(t("pleaseFixAllValidationErrors"));
@@ -578,8 +773,12 @@ const VehicleAddForm = () => {
             console.log("Car Brand Key being sent:", apiData.carBrand);
             console.log("Available Vehicle Makers in picklist:", picklistData.vehicleMakers);
 
-            const response = await api("o/c/vehicles", {
-                method: "POST",
+            // Use PUT for update, POST for create
+            const method = isEditMode ? "PUT" : "POST";
+            const url = isEditMode ? `o/c/vehicles/${vehicleId}` : "o/c/vehicles";
+
+            const response = await api(url, {
+                method: method,
                 body: JSON.stringify(apiData),
             });
 
@@ -599,10 +798,12 @@ const VehicleAddForm = () => {
                 throw new Error(errorData.title);
             }
 
-            toast.success(t("vehicleCreatedSuccess"));
-            setFormData(initialFormData);
-            setErrors({});
-            setFormTouched({});
+            toast.success(isEditMode ? t("vehicleUpdatedSuccess") || "Vehicle updated successfully" : t("vehicleCreatedSuccess"));
+            if (!isEditMode) {
+                setFormData(initialFormData);
+                setErrors({});
+                setFormTouched({});
+            }
             setShowSuccessPopup(true);
         } catch (error) {
             console.error("Submission error:", error.message);
@@ -616,6 +817,14 @@ const VehicleAddForm = () => {
         setIsLoading(true);
 
         try {
+            // Check Liferay session before saving draft
+            const sessionUser = await fetchCurrentUser();
+            if (!sessionUser) {
+                toast.error(t("sessionExpired") || "Your session has expired. Please sign in again.");
+                setIsLoading(false);
+                return;
+            }
+
             // Build API payload (same as submit) but force status to Draft
             const apiData = buildApiPayload(formData, true);
 
@@ -741,7 +950,7 @@ const VehicleAddForm = () => {
                 <form onSubmit={(e) => e.preventDefault()}>
                     <div className="form-container">
                         <div className="form-header">
-                            <h1>{t("addNewVehicle")}</h1>
+                            <h1>{isEditMode ? t("updateVehicle") || "Update Vehicle" : t("addNewVehicle")}</h1>
                         </div>
                         <MultiStepNav steps={steps} currentStep={currentStep} onStepChange={(step) => setCurrentStep(step)} spritemap={spritemap} />
                         <div className="form-wrapper-steps-content mt-5">{steps[currentStep].content}</div>

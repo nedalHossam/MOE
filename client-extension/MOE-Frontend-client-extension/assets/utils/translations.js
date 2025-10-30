@@ -286,11 +286,13 @@ export const translations = {
     registrationNumberRequired: 'Enter a registration number.',
     registrationExpiryDateRequired: 'This field is required.',
     registrationExpiryDateFuture: 'Registration expiry must be in the future.',
+    registrationExpiryDateMustBeInFuture: 'Registration expiry date must be in the future.',
     insurancePolicyTypeRequired: 'Select an insurance policy type.',
     insurancePolicyNumberRequired: 'Enter an insurance policy number.',
     insuranceCompanyRequired: 'Select an insurance company.',
     insuranceExpiryDateRequired: 'This field is required.',
     insuranceExpiryDateFuture: 'Insurance expiry must be in the future.',
+    insuranceExpiryDateMustBeInFuture: 'Insurance expiry date must be in the future.',
     ownershipTypeRequired: 'Select ownership type.',
     moeContractNumberRequired: 'Enter a MOE contract number.',
     carValueMOERequired: 'Enter a valid car value.',
@@ -307,7 +309,8 @@ export const translations = {
     monthlyGasLimitInvalid: 'Enter a valid monthly gas limit.',
     
     // Vehicle Success/Error Messages
-    vehicleCreatedSuccess: 'Vehicle created successfully!',
+    vehicleCreatedSuccess: 'Vehicle has been successfully created!',
+    vehicleUpdatedSuccess:'Vehicle has been successfully updated!',
     failedToCreateVehicle: 'Failed to create vehicle',
     failedToLoadData: 'Failed to load some data',
     failedToLoadDrivers: 'Failed to load drivers',
@@ -317,6 +320,7 @@ export const translations = {
     fileUploadFailed: 'Failed to upload file',
     pleaseFixValidationErrors: 'Please fix validation errors before proceeding to the next step.',
     pleaseFixAllValidationErrors: 'Please fix all validation errors before submitting.',
+    sessionExpired: 'Your session has expired. Please sign in again.',
     
     // Vehicle Status Values
     valid: 'Valid',
@@ -617,11 +621,13 @@ export const translations = {
     registrationNumberRequired: 'أدخل رقم التسجيل.',
     registrationExpiryDateRequired: 'هذا الحقل مطلوب.',
     registrationExpiryDateFuture: 'انتهاء التسجيل يجب أن يكون في المستقبل.',
+    registrationExpiryDateMustBeInFuture: 'تاريخ انتهاء التسجيل يجب أن يكون في المستقبل.',
     insurancePolicyTypeRequired: 'اختر نوع بوليصة التأمين.',
     insurancePolicyNumberRequired: 'أدخل رقم بوليصة التأمين.',
     insuranceCompanyRequired: 'اختر شركة التأمين.',
     insuranceExpiryDateRequired: 'هذا الحقل مطلوب.',
     insuranceExpiryDateFuture: 'انتهاء التأمين يجب أن يكون في المستقبل.',
+    insuranceExpiryDateMustBeInFuture: 'تاريخ انتهاء التأمين يجب أن يكون في المستقبل.',
     ownershipTypeRequired: 'اختر نوع الملكية.',
     moeContractNumberRequired: 'أدخل رقم عقد الوزارة.',
     carValueMOERequired: 'أدخل قيمة سيارة صحيحة.',
@@ -639,6 +645,7 @@ export const translations = {
     
     // Vehicle Success/Error Messages
     vehicleCreatedSuccess: 'تم إنشاء المركبة بنجاح!',
+    vehicleUpdatedSuccess: 'تم تعديل المركبة بنجاح!',
     failedToCreateVehicle: 'فشل في إنشاء المركبة',
     failedToLoadData: 'فشل في تحميل بعض البيانات',
     failedToLoadDrivers: 'فشل في تحميل السائقين',
@@ -648,6 +655,7 @@ export const translations = {
     fileUploadFailed: 'فشل في رفع الملف',
     pleaseFixValidationErrors: 'يرجى إصلاح أخطاء التحقق قبل المتابعة إلى الخطوة التالية.',
     pleaseFixAllValidationErrors: 'يرجى إصلاح جميع أخطاء التحقق قبل الإرسال.',
+    sessionExpired: 'انتهت جلستك. يرجى تسجيل الدخول مرة أخرى.',
     
     // Vehicle Status Values
     valid: 'صالح',

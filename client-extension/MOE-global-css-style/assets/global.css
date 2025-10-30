@@ -1,6 +1,9 @@
 /* Import Poppins font from Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
 
+/* Import style roots variables */
+@import './styleRoots.css';
+
 /* Global font family - Poppins with fallbacks */
 * {
     font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
@@ -151,6 +154,9 @@ p, span, div, a, button, input, textarea, select, label {
     border: 2px solid #e5e7eb;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+.form-text.blockquote {
+    display: none;
 }
 
 /* RTL Support for file upload */
@@ -607,301 +613,6 @@ margin-bottom: 0.5rem;
     width: 16px;
     height: 16px;
 }
-
-
-
-
- /* Stylebook Variable */
-:root {
-    /* Primary Color System */
-    --primary-main:#7A41F7;
-    --primary-100:#F1EBFE;
-    --primary-200:#DDCEFD;
-    --primary-300:#BB9DFB;
-    --primary-400:#4408C4;
-    --primary-500:#36069D;
-    --primary-600:#290576;
-    --primary-700:#7A41F7;
-    --primary-800:#F1EBFE;
-    --primary-opacity-10:#DDCEFD;
-    --primary-opacity-10:#BB9DFB;
-
-    /* Secondary Color System */
-    --secondary-main:#7A41F7;
-    --secondary-100:#F1EBFE;
-    --secondary-200:#DDCEFD;
-    --secondary-300:#BB9DFB;
-    --secondary-400:#4408C4;
-    --secondary-500:#36069D;
-    --secondary-600:#290576;
-    --secondary-700:#7A41F7;
-    --secondary-800:#F1EBFE;
-    --secondary-opacity-10:#DDCEFD;
-    --secondary-opacity-10:#BB9DFB;
-
-     /* StyleBook Color System */
-    --brand-color-1: #0b5fff;
-    --brand-color-2: #6b6c7e;
-    --brand-color-3: #2e5aac;
-    --brand-color-4: #30313f;
-
-
-    /* Grayscale */
-    --white: #fff;
-    --gray-100: #f7f8f9;
-    --gray-200: #f1f2f5;
-    --gray-300: #e7e7ed;
-    --gray-400: #cdced9;
-    --gray-500: #a7a9bc;
-    --gray-600: #6b6c7e;
-    --gray-700: #495057;
-    --gray-800: #393a4a;
-    --gray-900: #272833;
-    --black: #000;
-
-    /* Theme Colors */
-    --primary: var(--brand-color-1);
-    --secondary: var(--brand-color-2);
-    --success: #287d3c;
-    --info: var(--brand-color-3);
-    --warning: #b95000;
-    --danger: #da1414;
-    --gray-dark: var(--gray-800);
-    --dark: var(--gray-900);
-    --light: var(--gray-200);
-    --lighter: var(--gray-100);
-
-    /* Spacing */
-    --spacer-0: 0;
-    --spacer-1: 0.25rem;
-    --spacer-2: 0.5rem;
-    --spacer-3: 1rem;
-    --spacer-4: 1.5rem;
-    --spacer-5: 3rem;
-    --spacer-6: 4.5rem;
-    --spacer-7: 6rem;
-    --spacer-8: 7.5rem;
-    --spacer-9: 9rem;
-    --spacer-10: 10rem;
-
-    /* Body */
-    --body-bg: var(--white);
-    --body-color: #1c1c24;
-
-    /* Borders */
-    --border-color: var(--gray-300);
-    --border-width: 1px;
-    --border-radius: 0.25rem;
-    --border-radius-sm: 0.1875rem;
-    --border-radius-lg: 0.375rem;
-    --border-radius-circle: 50%;
-    --rounded-pill: 50rem;
-
-    /* Shadows */
-    --box-shadow: 0 .5rem 1rem rgba(0, 0, 0, .15);
-    --box-shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
-    --box-shadow-lg: 0 1rem 3rem rgba(0, 0, 0, .175);
-
-    /* Aspect Ratios */
-    --aspect-ratio: 100%;
-    --aspect-ratio-4-to-3: 75%;
-    --aspect-ratio-8-to-3: 37.5%;
-    --aspect-ratio-16-to-9: 56.25%;
-
-    /* Transitions */
-    --transition-collapse: height .35s ease;
-    --transition-fade: opacity .15s linear;
-    --transition-base: all 0.2s ease;
-
-    /* Containers */
-    --container-max-sm: 540px;
-    --container-max-md: 720px;
-    --container-max-lg: 960px;
-    --container-max-xl: 1248px;
-
-    /* Typography */
-    --font-family-sans-serif: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen-Sans, Ubuntu, Cantarell, 'Helvetica Neue', Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol';
-    --font-family-monospace: SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
-    --font-family-base: var(--font-family-sans-serif);
-    --font-size-base: 0.875rem;
-    --font-size-sm: 0.75rem;
-    --font-size-lg: 1.125rem;
-    --font-weight-lighter: lighter;
-    --font-weight-light: 300;
-    --font-weight-normal: 400;
-    --font-weight-semi-bold: 600;
-    --font-weight-bold: 700;
-    --font-weight-bolder: 900;
-    --line-height-base: 1.5;
-
-    /* Headings */
-    --h1-font-size: 1.625rem;
-    --h2-font-size: 1.375rem;
-    --h3-font-size: 1.1875rem;
-    --h4-font-size: 1rem;
-    --h5-font-size: 0.875rem;
-    --h6-font-size: 0.8125rem;
-    --display1-size: 6rem;
-    --display2-size: 5.5rem;
-    --display3-size: 4.5rem;
-    --display4-size: 3.5rem;
-    --display1-weight: 300;
-    --display2-weight: 300;
-    --display3-weight: 300;
-    --display4-weight: 300;
-    --display-line-height: 1.2;
-
-    /* Text Elements */
-    --lead-font-size: 1.25rem;
-    --lead-font-weight: 300;
-    --text-muted: var(--gray-500);
-    --blockquote-font-size: 1.25rem;
-    --blockquote-small-color: var(--gray-600);
-    --blockquote-small-font-size: 80%;
-
-    /* Dividers */
-    --hr-border-color: rgba(0, 0, 0, .1);
-    --hr-border-width: var(--border-width);
-    --hr-border-margin-y: var(--spacer-3);
-
-    /* Buttons */
-    --btn-padding-y: 0.375rem;
-    --btn-padding-x: 0.75rem;
-    --btn-font-size: var(--font-size-base);
-    --btn-line-height: var(--line-height-base);
-    --btn-border-radius: var(--border-radius);
-
-
-
-    /* Toastify variables */
-    --toastify-color-light: var(--white);
-    --toastify-color-dark: #121212;
-    --toastify-color-info: #3498db;
-    --toastify-color-success: #07bc0c;
-    --toastify-color-warning: #f1c40f;
-    --toastify-color-error: #e74c3c;
-    --toastify-color-transparent: rgba(255, 255, 255, 0.7);
-    --toastify-icon-color-info: var(--toastify-color-info);
-    --toastify-icon-color-success: var(--toastify-color-success);
-    --toastify-icon-color-warning: var(--toastify-color-warning);
-    --toastify-icon-color-error: var(--toastify-color-error);
-    --toastify-toast-width: 320px;
-    --toastify-toast-background: var(--white);
-    --toastify-toast-min-height: 64px;
-    --toastify-toast-max-height: 800px;
-    --toastify-font-family: sans-serif;
-    --toastify-z-index: 9999;
-    --toastify-text-color-light: #757575;
-    --toastify-text-color-dark: var(--white);
-    --toastify-text-color-info: var(--white);
-    --toastify-text-color-success: var(--white);
-    --toastify-text-color-warning: var(--white);
-    --toastify-text-color-error: var(--white);
-    --toastify-spinner-color: #616161;
-    --toastify-spinner-color-empty-area: #e0e0e0;
-    --toastify-color-progress-light: linear-gradient(to right, #4cd964, #5ac8fa, #007aff, #34aadc, #5856d6, #ff2d55);
-    --toastify-color-progress-dark: #bb86fc;
-    --toastify-color-progress-info: var(--toastify-color-info);
-    --toastify-color-progress-success: var(--toastify-color-success);
-    --toastify-color-progress-warning: var(--toastify-color-warning);
-    --toastify-color-progress-error: var(--toastify-color-error);
-
-
-    /*buttons */
-         /* Primary */
-        --btn-primary-background-color: var(--primary);
-        --btn-primary-border-color: var(--primary);
-        --btn-primary-color: var(--white);
-        --btn-primary-hover-background-color: #0053f0;
-        --btn-primary-hover-border-color: transparent;
-        --btn-primary-hover-color: var(--white);
-
-        /* Secondary */
-        --btn-secondary-background-color: var(--white);
-        --btn-secondary-border-color: var(--gray-400);
-        --btn-secondary-color: var(--gray-600);
-        --btn-secondary-hover-background-color: var(--gray-100);
-        --btn-secondary-hover-border-color: var(--gray-400);
-        --btn-secondary-hover-color: var(--gray-900);
-
-        /* Success */
-        --btn-success-background-color: var(--success);
-        --btn-success-border-color: var(--success);
-        --btn-success-color: var(--white);
-        --btn-success-hover-background-color: #1a9f53;
-        --btn-success-hover-border-color: transparent;
-        --btn-success-hover-color: var(--white);
-
-        /* Warning */
-        --btn-warning-background-color: var(--warning);
-        --btn-warning-border-color: var(--warning);
-        --btn-warning-color: var(--white);
-        --btn-warning-hover-background-color: #e6a303;
-        --btn-warning-hover-border-color: transparent;
-        --btn-warning-hover-color: var(--white);
-
-        /* Danger */
-        --btn-danger-background-color: var(--danger);
-        --btn-danger-border-color: var(--danger);
-        --btn-danger-color: var(--white);
-        --btn-danger-hover-background-color: #d93737;
-        --btn-danger-hover-border-color: transparent;
-        --btn-danger-hover-color: var(--white);
-
-        /* Outline Colors */
-        --btn-outline-primary-border-color: var(--primary);
-        --btn-outline-primary-color: var(--primary);
-        --btn-outline-primary-hover-background-color: #f0f5ff;
-        --btn-outline-primary-hover-border-color: var(--primary);
-        --btn-outline-primary-hover-color: var(--primary);
-
-        --btn-outline-secondary-border-color: var(--gray-400);
-        --btn-outline-secondary-color: var(--gray-600);
-        --btn-outline-secondary-hover-background-color: rgba(39, 40, 51, 0.03);
-        --btn-outline-secondary-hover-border-color: transparent;
-        --btn-outline-secondary-hover-color: var(--gray-900);
-
-        --btn-outline-success-border-color: var(--success);
-        --btn-outline-success-color: var(--success);
-        --btn-outline-success-hover-background-color: #f0faf4;
-        --btn-outline-success-hover-border-color: var(--success);
-        --btn-outline-success-hover-color: var(--success);
-
-        --btn-outline-warning-border-color: var(--warning);
-        --btn-outline-warning-color: var(--warning);
-        --btn-outline-warning-hover-background-color: #fff9e6;
-        --btn-outline-warning-hover-border-color: var(--warning);
-        --btn-outline-warning-hover-color: var(--warning);
-
-        --btn-outline-danger-border-color: var(--danger);
-        --btn-outline-danger-color: var(--danger);
-        --btn-outline-danger-hover-background-color: #fff0f0;
-        --btn-outline-danger-hover-border-color: var(--danger);
-        --btn-outline-danger-hover-color: var(--danger);
-
-        /* Link */
-        --btn-link-color: var(--primary);
-        --btn-link-hover-color: #004ad7;
-
-        /* Black Button Variables */
-        --btn-black-background-color: #000000;
-        --btn-black-border-color: #000000;
-        --btn-black-color: #ffffff;
-        --btn-black-hover-background-color: #333333;
-        --btn-black-hover-border-color: transparent;
-        --btn-black-hover-color: #ffffff;
-
-        /* Outline Black Button Variables */
-        --btn-outline-black-border-color: #000000;
-        --btn-outline-black-color: #000000;
-        --btn-outline-black-hover-background-color: rgba(0, 0, 0, 0.05);
-        --btn-outline-black-hover-border-color: #000000;
-        --btn-outline-black-hover-color: #000000;
-
-
-}
-
-
 
 /* General Styles */
 .required-asterisk {
@@ -2823,7 +2534,7 @@ display:none !important;
 }
 
 .success-popup-message {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 500;
   color: #333;
   line-height: 1.4;

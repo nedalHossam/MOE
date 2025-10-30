@@ -1,21 +1,27 @@
 import moment from "moment";
 
 export const computeLicenseStatus = (expiry, t) => {
-    if (!expiry) return t("valid");
+    if (!expiry) return "Valid";
     const today = moment().startOf("day");
+    const tomorrow = moment().startOf("day").add(1, "day");
     const exp = moment(expiry, "YYYY-MM-DD");
-    if (exp.isBefore(today)) return t("expired");
-    if (exp.diff(today, "days") <= 30) return t("aboutToExpire");
-    return t("valid");
+    // If expired (before today), today, or tomorrow, return "Expired"
+    if (exp.isSameOrBefore(today)) return "Expired";
+//    if (exp.isSame(tomorrow)) return "Expired";
+    if (exp.diff(today, "days") <= 30) return "AboutToExpire";
+    return "Valid";
 };
 
 export const computeInsuranceStatus = (expiry, t) => {
-    if (!expiry) return t("valid");
+    if (!expiry) return "Valid";
     const today = moment().startOf("day");
+    const tomorrow = moment().startOf("day").add(1, "day");
     const exp = moment(expiry, "YYYY-MM-DD");
-    if (exp.isBefore(today)) return t("expired");
-    if (exp.diff(today, "days") <= 30) return t("aboutToExpire");
-    return t("valid");
+    // If expired (before today), today, or tomorrow, return "Expired"
+    if (exp.isSameOrBefore(today)) return "Expired";
+//    if (exp.isSame(tomorrow)) return "Expired";
+    if (exp.diff(today, "days") <= 30) return "AboutToExpire";
+    return "Valid";
 };
 
 export const validateField = (field, value, formData, picklistData, isDirector, t) => {
@@ -89,8 +95,17 @@ export const validateField = (field, value, formData, picklistData, isDirector, 
         case "registrationExpiryDate":
             if (!value || value.trim().length === 0) {
                 fieldError = t("registrationExpiryDateRequired");
-            } else if (!moment(value).isValid() || moment(value).isBefore(moment().startOf("day"))) {
+            } else if (!moment(value).isValid()) {
                 fieldError = t("registrationExpiryDateFuture");
+            } else {
+                const today = moment().startOf("day");
+                const tomorrow = moment().startOf("day").add(1, "day");
+                const expiryDate = moment(value);
+                
+                // Show error if date is today or tomorrow
+                if (expiryDate.isSameOrBefore(today) ) {
+                    fieldError = t("registrationExpiryDateMustBeInFuture");
+                }
             }
             break;
         case "insurancePolicyType":
@@ -113,10 +128,17 @@ export const validateField = (field, value, formData, picklistData, isDirector, 
                 fieldError = t("insuranceExpiryDateRequired");
             } else {
                 const momentValue = moment(value);
-                const today = moment().startOf("day");
 
-                if (!momentValue.isValid() || momentValue.isBefore(today)) {
+                if (!momentValue.isValid()) {
                     fieldError = t("insuranceExpiryDateFuture");
+                } else {
+                    const today = moment().startOf("day");
+                    const tomorrow = moment().startOf("day").add(1, "day");
+                    
+                    // Show error if date is today or tomorrow
+                    if (momentValue.isSameOrBefore(today)) {
+                        fieldError = t("insuranceExpiryDateMustBeInFuture");
+                    }
                 }
             }
             break;
@@ -286,8 +308,14 @@ export const validateLicenseInsurance = (formData, t) => {
 
     if (!formData.registrationExpiryDate || formData.registrationExpiryDate.trim().length === 0) {
         errs.registrationExpiryDate = "This field is required.";
-    } else if (!moment(formData.registrationExpiryDate).isValid() || moment(formData.registrationExpiryDate).isBefore(moment().startOf("day"))) {
-        errs.registrationExpiryDate = "Registration expiry must be in the future.";
+    } else if (!moment(formData.registrationExpiryDate).isValid()) {
+        errs.registrationExpiryDate = "Registration expiry must be valid.";
+    } else {
+        // Check if the computed license status is Expired
+        const computedLicenseStatus = computeLicenseStatus(formData.registrationExpiryDate, t);
+        if (computedLicenseStatus === "Expired") {
+            errs.registrationExpiryDate = t("registrationExpiryDateMustBeInFuture");
+        }
     }
 
     if (!formData.insurancePolicyType) {
@@ -304,8 +332,14 @@ export const validateLicenseInsurance = (formData, t) => {
 
     if (!formData.insuranceExpiryDate || formData.insuranceExpiryDate.trim().length === 0) {
         errs.insuranceExpiryDate = "This field is required.";
-    } else if (!moment(formData.insuranceExpiryDate).isValid() || moment(formData.insuranceExpiryDate).isBefore(moment().startOf("day"))) {
-        errs.insuranceExpiryDate = "Insurance expiry must be in the future.";
+    } else if (!moment(formData.insuranceExpiryDate).isValid()) {
+        errs.insuranceExpiryDate = "Insurance expiry must be valid.";
+    } else {
+        // Check if the computed insurance status is Expired
+        const computedInsuranceStatus = computeInsuranceStatus(formData.insuranceExpiryDate, t);
+        if (computedInsuranceStatus === "Expired") {
+            errs.insuranceExpiryDate = t("insuranceExpiryDateMustBeInFuture");
+        }
     }
 
     return errs;
