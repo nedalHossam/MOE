@@ -417,17 +417,19 @@ export const validateOperationalInfo = (formData, t, isDirector) => {
         errs.startingKM = "Enter a valid current KM.";
     }
 
-    if (formData.monthlyKMLimit && parseFloat(formData.monthlyKMLimit) <= 0) {
-        errs.monthlyKMLimit = "Enter a valid monthly KM limit.";
+    if (formData.monthlyKMLimit !== undefined && formData.monthlyKMLimit !== null && String(formData.monthlyKMLimit).trim() !== "") {
+        if (parseFloat(formData.monthlyKMLimit) < 0) {
+            errs.monthlyKMLimit = "Enter a valid monthly KM limit.";
+        }
     }
 
-    if (formData.monthlyGasLimit && parseFloat(formData.monthlyGasLimit) <= 0) {
-        errs.monthlyGasLimit = "Enter a valid monthly gas limit.";
+    if (formData.monthlyGasLimit !== undefined && formData.monthlyGasLimit !== null && String(formData.monthlyGasLimit).trim() !== "") {
+        if (parseFloat(formData.monthlyGasLimit) < 0) {
+            errs.monthlyGasLimit = "Enter a valid monthly gas limit.";
+        }
     }
 
-    if (isDirector && !formData.department) {
-        errs.department = "Select a department.";
-    }
+    // Department is optional regardless of role
 
     return errs;
 };

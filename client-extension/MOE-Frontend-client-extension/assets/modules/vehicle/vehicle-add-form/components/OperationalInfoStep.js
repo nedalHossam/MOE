@@ -262,23 +262,18 @@ const OperationalInfoStep = ({ formData, errors, picklistData, optionsLoading, i
                     <label>{t("preferredMOEEmployee")}</label>
                     <SelectComponent
                         options={picklistData.employees}
-                        value={formData.preferredMOEEmployee ? formData.preferredMOEEmployee.map((e) => e.value) : []}
-                        onChange={(values) => {
-                            const selectedOptions = picklistData.employees.filter((employee) => values.includes(employee.value));
-                            setField("preferredMOEEmployee", selectedOptions);
-                        }}
+                        value={formData.preferredMOEEmployee}
+                        onChange={(value) => setField("preferredMOEEmployee", value)}
                         isLoading={optionsLoading}
                         placeholder={t("preferredMOEEmployeePlaceholder")}
-                        isMulti={true}
+                        isMulti={false}
                         currentLanguage={currentLanguage}
                     />
                 </ClayForm.Group>
 
                 {isDirector && (
                     <ClayForm.Group>
-                        <label>
-                            {t("department")} <span className="required-asterisk">*</span>
-                        </label>
+                        <label>{t("department")}</label>
                         <SelectComponent
                             options={picklistData.departments}
                             value={formData.department}

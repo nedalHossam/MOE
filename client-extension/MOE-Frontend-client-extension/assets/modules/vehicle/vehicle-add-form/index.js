@@ -49,7 +49,7 @@ const getLocaleObject = (symbol) => {
  * @param {Object} vehicleData - The vehicle data from API
  * @returns {Object} Form data object
  */
-const mapVehicleDataToFormData = (vehicleData) => {
+const mapVehicleDataToFormData = (vehicleData, defaultDepartment) => {
     const formData = {};
 
     // Helper to extract key from object or i18n structure
@@ -170,14 +170,20 @@ const mapVehicleDataToFormData = (vehicleData) => {
     
     // Keep as number to match select option values (administrations have numeric value: user.id)
     formData.preferredAdministration = vehicleData.r_preferredAdministration_userId != null ? vehicleData.r_preferredAdministration_userId : "";
-    if (vehicleData.r_preferredMoeEmployee_userId) {
-        formData.preferredMOEEmployee = [{ value: vehicleData.r_preferredMoeEmployee_userId }];
-    } else {
-        formData.preferredMOEEmployee = [];
-    }
+    formData.preferredMOEEmployee = vehicleData.r_preferredMoeEmployee_userId != null ? vehicleData.r_preferredMoeEmployee_userId : "";
     
-    formData.department = getKey("department");
+    // Department: use vehicle value if present, otherwise fallback to provided defaultDepartment
+    const mappedDepartment = getKey("department") || defaultDepartment || "";
+    formData.department = mappedDepartment;
     formData.department_i18n = getI18n("department");
+    if (!formData.department_i18n || Object.keys(formData.department_i18n).length === 0) {
+        if (mappedDepartment) {
+            formData.department_i18n = {
+                en_US: mappedDepartment,
+                ar_SA: mappedDepartment,
+            };
+        }
+    }
 
     // Attachments
     formData.attachments = vehicleData.attachments || null;
@@ -406,7 +412,7 @@ const VehicleAddForm = () => {
                     const vehicleData = await getVehicleById(editVehicleId);
                     if (vehicleData) {
                         // Map vehicle data to form data structure
-                        const mappedFormData = mapVehicleDataToFormData(vehicleData);
+                        const mappedFormData = mapVehicleDataToFormData(vehicleData, currentUserData?.department);
                         
                         // Update form data with mapped vehicle data
                         setFormData((prev) => ({
@@ -415,6 +421,8 @@ const VehicleAddForm = () => {
                         }));
                         
                         console.log("Vehicle data loaded and populated:", vehicleData);
+                    } else {
+                        toast.error(t("vehicleIdNotFound") || "This vehicle ID was not found");
                     }
                 }
             } catch (error) {
@@ -639,7 +647,7 @@ const VehicleAddForm = () => {
                 currentStepErrors = validateOwnership(formData, picklistData, t);
                 break;
             case 3: // Operational Info
-                currentStepErrors = validateOperationalInfo(formData, t, isDirector);
+                currentStepErrors = validateOperationalInfo(formData, t);
                 break;
             case 4: // Attachment
                 currentStepErrors = validateAttachment();
@@ -713,14 +721,6 @@ const VehicleAddForm = () => {
         setIsLoading(true);
 
         try {
-            // Check Liferay session before submitting
-            const sessionUser = await fetchCurrentUser();
-            if (!sessionUser) {
-                toast.error(t("sessionExpired"));
-                setIsLoading(false);
-                return;
-            }
-
             // Validate all sections
             if (!validateAllSections(formData, picklistData, t, isDirector)) {
                 toast.error(t("pleaseFixAllValidationErrors"));
@@ -778,14 +778,6 @@ const VehicleAddForm = () => {
         setIsLoading(true);
 
         try {
-            // Check Liferay session before saving draft
-            const sessionUser = await fetchCurrentUser();
-            if (!sessionUser) {
-                toast.error(t("sessionExpired"));
-                setIsLoading(false);
-                return;
-            }
-
             // Build API payload (same as submit) but force status to Draft
             const apiData = buildApiPayload(formData, true);
 

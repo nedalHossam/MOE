@@ -146,7 +146,7 @@ export const translations = {
     
     // File upload
     selectFile: 'Select File',
-    uploadHint10MB: 'Max file size 10 MB. Allowed types: JPEG, JPG, PDF, PNG.',
+    uploadHint10MB: 'Max file size 10 MB. Allowed types: JPEG, JPG, PDF, PNG',
     uploadHint: 'Upload a jpeg, jpg, pdf, png no larger than 100 MB.',
     uploadHintSmall: 'Upload a jpeg, jpg, pdf, png no larger than 5 MB.',
     uploadHintMedia: 'Upload a jpeg, jpg, png, mp4, avi, mov no larger than 25 MB.',
@@ -491,7 +491,7 @@ export const translations = {
     
     // File upload
     selectFile: 'اختر ملف',
-    uploadHint10MB: 'الحد الأقصى لحجم الملف 10 ميجابايت. الأنواع المسموح بها: JPEG, JPG, PDF, PNG.',
+    uploadHint10MB: 'الحد الأقصى لحجم الملف 10 ميجابايت. الأنواع المسموح بها: JPEG, JPG, PDF, PNG',
     uploadHint: 'ارفع ملف jpeg أو jpg أو pdf أو png لا يزيد حجمه عن 100 ميجابايت.',
     uploadHintSmall: 'ارفع ملف jpeg أو jpg أو pdf أو png لا يزيد حجمه عن 5 ميجابايت.',
     uploadHintMedia: 'ارفع ملف jpeg أو jpg أو png أو mp4 أو avi أو mov لا يزيد حجمه عن 25 ميجابايت.',

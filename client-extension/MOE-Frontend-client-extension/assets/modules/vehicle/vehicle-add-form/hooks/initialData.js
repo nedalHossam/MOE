@@ -68,7 +68,7 @@ export const createInitialFormData = (t) => {
         monthlyGasLimit: "",
         r_drivers_c_driverId: [], // Multiple drivers
         preferredAdministration: "",
-        preferredMOEEmployee: [],
+        preferredMOEEmployee: "",
         department: "",
         department_i18n: {},
         // attachments

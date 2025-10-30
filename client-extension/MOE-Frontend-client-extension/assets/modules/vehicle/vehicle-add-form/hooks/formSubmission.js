@@ -62,10 +62,8 @@ export const buildApiPayload = (formData, isDraft = false) => {
     if (formData.preferredAdministration) {
         apiData.r_preferredAdministration_userId = formData.preferredAdministration;
     }
-    if (formData.preferredMOEEmployee && formData.preferredMOEEmployee.length > 0) {
-        // Extract the value from the selected option
-        const employeeValue = formData.preferredMOEEmployee[0].value;
-        apiData.r_preferredMoeEmployee_userId = employeeValue;
+    if (formData.preferredMOEEmployee) {
+        apiData.r_preferredMoeEmployee_userId = formData.preferredMOEEmployee;
     }
 
     // File attachments

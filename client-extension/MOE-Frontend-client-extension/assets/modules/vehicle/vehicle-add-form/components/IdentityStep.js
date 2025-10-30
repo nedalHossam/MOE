@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import ClayForm, { ClayInput } from "@clayui/form";
 import ClayIcon from "@clayui/icon";
 import { TextInput, SelectComponent } from "../../../../components/ui";
@@ -53,6 +53,28 @@ const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoadin
         }
     };
 
+    // Track if status should remain editable during this edit session
+    const [canEditStatus, setCanEditStatus] = useState(false);
+
+    useEffect(() => {
+        const isDraft = String(formData.vehicleStatus || "").toLowerCase() === "draft";
+        if (isEditMode && isDraft) {
+            setCanEditStatus(true);
+        }
+    }, [isEditMode, formData.vehicleStatus]);
+
+    // Compute status options: in edit mode with Draft status, hide OnTrip and InMaintenance
+    const statusOptions = (() => {
+        const original = Array.isArray(picklistData.status) ? picklistData.status : [];
+        const isDraftEdit = isEditMode && String(formData.vehicleStatus || "").toLowerCase() === "draft";
+        if (!isDraftEdit) return original;
+        const blocked = new Set(["ontrip", "inmaintenance"]);
+        return original.filter((opt) => {
+            const key = String(opt.key || opt.value || "").toLowerCase();
+            return !blocked.has(key);
+        });
+    })();
+
     return (
         <div className="step-content">
             <div className="form-grid form-grid-3">
@@ -61,18 +83,11 @@ const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoadin
                         {t("status")} <span className="required-asterisk">*</span>
                     </label>
                     <SelectComponent
-                        options={picklistData.status}
+                        options={statusOptions}
                         value={formData.vehicleStatus}
                         onChange={(value) => handleSelectChangeWithI18n("vehicleStatus", value)}
                         isLoading={optionsLoading}
-                        isDisabled={
-                            optionsLoading ||
-                            isLoading ||
-                            !(
-                                isEditMode &&
-                                String(formData.vehicleStatus || "").toLowerCase() === "draft"
-                            )
-                        }
+                        isDisabled={optionsLoading || isLoading || !(isEditMode && canEditStatus)}
                         placeholder={t("statusPlaceholder")}
                         isMulti={false}
                         currentLanguage={currentLanguage}
