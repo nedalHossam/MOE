@@ -29,6 +29,7 @@ import {
 import { locales } from "./constants";
 import { buildApiPayload } from "./hooks/formSubmission";
 import { createInitialFormData } from "./hooks/initialData";
+import { useFileUpload } from "../../../hooks/useFileUpload";
 
 // Import components
 import MultiStepNav from "./components/MultiStepNav";
@@ -246,6 +247,7 @@ const VehicleAddForm = () => {
     const [currentUser, setCurrentUser] = useState(null);
     const [vehicleId, setVehicleId] = useState(null);
     const [isEditMode, setIsEditMode] = useState(false);
+    const { isUploading: isFileUploading, handleFileUpload: uploadFile } = useFileUpload(t);
 
     // Check if current user has Director role
     const isDirector = useMemo(() => {
@@ -606,60 +608,19 @@ const VehicleAddForm = () => {
     };
 
     const handleFileUpload = async (file, type) => {
-        try {
-            // Debug: Check current user and permissions
-
-            // First, try to upload to a specific folder
-            const formData = new FormData();
-
-            // Generate a unique filename by adding timestamp
-            const timestamp = new Date().getTime();
-            const fileExtension = file.name.split(".").pop();
-            const uniqueFileName = `${file.name.split(".")[0]}_${timestamp}.${fileExtension}`;
-
-            formData.append("file", file);
-            formData.append("title", uniqueFileName);
-            formData.append("description", type === "attachments" ? "Vehicle attachments" : "Vehicle Document");
-
-            // Try uploading to the default Documents and Media folder
-            let uploadResponse = await fetch(`/o/headless-delivery/v1.0/sites/${Liferay.ThemeDisplay.getSiteGroupId()}/documents`, {
-                method: "POST",
-                headers: {
-                    "x-csrf-token": Liferay.authToken,
-                    Accept: "application/json",
-                },
-                body: formData,
-            });
-
-            if (!uploadResponse.ok) {
-                if (uploadResponse.status === 409) {
-                    toast.error(t("fileTitleExists") || "A file with this title already exists. Please rename and try again.");
-                } else {
-                    const errorData = await uploadResponse.json();
-                    console.error("Upload failed:", errorData);
-                    const errorMessage = errorData.title || errorData.message || t("fileUploadFailed") || "File upload failed";
-                    toast.error(errorMessage);
-                }
-                throw new Error('File upload failed');
-            }
-
-            const uploadedFile = await uploadResponse.json();
-
-            // Update the form data with the uploaded file info
+        const normalizedType = type === "attachments" ? "attachment" : type;
+        const result = await uploadFile(file, normalizedType);
+        if (result) {
             setFormData((prev) => ({
                 ...prev,
                 attachments: {
-                    id: uploadedFile.id,
-                    name: uploadedFile.title,
-                    url: uploadedFile.contentUrl,
+                    id: result.id,
+                    name: result.name,
+                    url: result.url,
                 },
             }));
-
-            return uploadedFile;
-        } catch (error) {
-            console.error("Error uploading file:", error);
-            return null;
         }
+        return result;
     };
 
     // Step navigation functions
@@ -755,7 +716,7 @@ const VehicleAddForm = () => {
             // Check Liferay session before submitting
             const sessionUser = await fetchCurrentUser();
             if (!sessionUser) {
-                toast.error(t("sessionExpired") || "Your session has expired. Please sign in again.");
+                toast.error(t("sessionExpired"));
                 setIsLoading(false);
                 return;
             }
@@ -807,7 +768,7 @@ const VehicleAddForm = () => {
             setShowSuccessPopup(true);
         } catch (error) {
             console.error("Submission error:", error.message);
-            toast.error(error.message);
+            toast.error(t("submissionFailed"));
         } finally {
             setIsLoading(false);
         }
@@ -820,7 +781,7 @@ const VehicleAddForm = () => {
             // Check Liferay session before saving draft
             const sessionUser = await fetchCurrentUser();
             if (!sessionUser) {
-                toast.error(t("sessionExpired") || "Your session has expired. Please sign in again.");
+                toast.error(t("sessionExpired"));
                 setIsLoading(false);
                 return;
             }
@@ -847,13 +808,13 @@ const VehicleAddForm = () => {
                 throw new Error(errorData.title);
             }
 
-            toast.success(t("savedAsDraft") || "Saved as draft");
+            toast.success(t("savedAsDraft"));
             setShowSuccessPopup(false);
             setIsLoading(false);
             // Do not reset the form so the user can continue editing if they want
         } catch (error) {
             console.error("Save draft error:", error.message);
-            toast.error(error.message);
+            toast.error(t("saveDraftFailed"));
         } finally {
             setIsLoading(false);
         }

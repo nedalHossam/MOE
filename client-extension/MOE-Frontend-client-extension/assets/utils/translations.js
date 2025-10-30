@@ -49,10 +49,13 @@ export const translations = {
     errorOccurredWhileUpdatingBenefit: 'Error occurred while updating benefit',
     benefitIdRequired: 'Benefit ID is required',
     fileUploadedSuccess: 'File uploaded successfully',
+    fileUploadedSuccessfully: 'File uploaded successfully',
     fileUploadedSuccessWithNewName: 'File uploaded successfully with a new name',
     fileUploadFailed: 'File upload failed',
     fileRemoved: 'File removed',
     failedToUploadFile: 'Failed to upload file',
+    submissionFailed: 'Submission failed',
+    saveDraftFailed: 'Failed to save draft',
     
     // Pagination
     totalItems: 'Total',
@@ -143,6 +146,7 @@ export const translations = {
     
     // File upload
     selectFile: 'Select File',
+    uploadHint10MB: 'Max file size 10 MB. Allowed types: JPEG, JPG, PDF, PNG.',
     uploadHint: 'Upload a jpeg, jpg, pdf, png no larger than 100 MB.',
     uploadHintSmall: 'Upload a jpeg, jpg, pdf, png no larger than 5 MB.',
     uploadHintMedia: 'Upload a jpeg, jpg, png, mp4, avi, mov no larger than 25 MB.',
@@ -325,6 +329,7 @@ export const translations = {
     pleaseFixValidationErrors: 'Please fix validation errors before proceeding to the next step.',
     pleaseFixAllValidationErrors: 'Please fix all validation errors before submitting.',
     sessionExpired: 'Your session has expired. Please sign in again.',
+    attachmentDescriptionPlaceholder : 'Attachment Description Placeholder',
     
     // Vehicle Status Values
     valid: 'Valid',
@@ -341,6 +346,7 @@ export const translations = {
   },
   'ar-SA': {
     // Common
+       attachmentDescriptionPlaceholder : 'وصف المرفق',
     searchPlaceholder: 'البحث في المنافع...',
     addBenefit: 'إضافة منفعة',
     createBenefit: 'إنشاء منفعة',
@@ -388,10 +394,13 @@ export const translations = {
     errorOccurredWhileUpdatingBenefit: 'حدث خطأ أثناء تحديث المنفعة',
     benefitIdRequired: 'معرف المنفعة مطلوب',
     fileUploadedSuccess: 'تم رفع الملف بنجاح',
+    fileUploadedSuccessfully: 'تم رفع الملف بنجاح',
     fileUploadedSuccessWithNewName: 'تم رفع الملف بنجاح باسم جديد',
     fileUploadFailed: 'فشل رفع الملف',
     fileRemoved: 'تم إزالة الملف',
     failedToUploadFile: 'فشل في رفع الملف',
+    submissionFailed: 'فشل الإرسال',
+    saveDraftFailed: 'فشل حفظ المسودة',
     
     // Pagination
     totalItems: 'إجمالي',
@@ -482,6 +491,7 @@ export const translations = {
     
     // File upload
     selectFile: 'اختر ملف',
+    uploadHint10MB: 'الحد الأقصى لحجم الملف 10 ميجابايت. الأنواع المسموح بها: JPEG, JPG, PDF, PNG.',
     uploadHint: 'ارفع ملف jpeg أو jpg أو pdf أو png لا يزيد حجمه عن 100 ميجابايت.',
     uploadHintSmall: 'ارفع ملف jpeg أو jpg أو pdf أو png لا يزيد حجمه عن 5 ميجابايت.',
     uploadHintMedia: 'ارفع ملف jpeg أو jpg أو png أو mp4 أو avi أو mov لا يزيد حجمه عن 25 ميجابايت.',

@@ -1,4 +1,5 @@
 import React, { useRef, useState } from 'react';
+import { useTranslation } from '../../utils/translations';
 import ClayForm from '@clayui/form';
 
 const InputFileUpload = ({ 
@@ -6,13 +7,14 @@ const InputFileUpload = ({
   onChange, 
   required = false, 
   name, 
-  accept = "image/*",
+  accept = ".jpeg,.jpg,.png,.pdf",
   placeholder = "المرفق",
   className = "",
   value = null // Accept value prop for uploaded file name
 }) => {
   const [fileName, setFileName] = useState(value || '');
   const fileInputRef = useRef();
+  const { t } = useTranslation();
 
   // Update fileName when value prop changes
   React.useEffect(() => {
@@ -88,6 +90,8 @@ const InputFileUpload = ({
         )}
       </div>
       
+      <div className="file-upload-hint">{t('uploadHint10MB')}</div>
+
       <input
         id={name}
         name={name}
