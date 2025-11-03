@@ -728,8 +728,36 @@ const VehicleAddForm = () => {
                 return;
             }
 
+            // If in edit mode and status is draft, change it to active on submit
+            let submitFormData = { ...formData };
+            if (isEditMode && String(formData.vehicleStatus || "").toLowerCase() === "draft") {
+                // Find the Active status option to get its key and i18n data
+                const activeStatusOption = picklistData.status.find(
+                    opt => String(opt.key || opt.value || "").toLowerCase() === "active"
+                );
+                
+                if (activeStatusOption) {
+                    const activeKey = activeStatusOption.key || activeStatusOption.value;
+                    const i18nData = {};
+                    if (activeStatusOption.name_i18n) {
+                        if (activeStatusOption.name_i18n['en_US'] || activeStatusOption.name_i18n['en-US']) {
+                            i18nData['en_US'] = activeStatusOption.name_i18n['en_US'] || activeStatusOption.name_i18n['en-US'];
+                        }
+                        if (activeStatusOption.name_i18n['ar_SA'] || activeStatusOption.name_i18n['ar-SA']) {
+                            i18nData['ar_SA'] = activeStatusOption.name_i18n['ar_SA'] || activeStatusOption.name_i18n['ar-SA'];
+                        }
+                    }
+                    
+                    submitFormData.vehicleStatus = activeKey;
+                    submitFormData.vehicleStatus_i18n = i18nData;
+                } else {
+                    // Fallback if Active status not found in picklist
+                    submitFormData.vehicleStatus = "Active";
+                }
+            }
+
             // Build API payload using utility function
-            const apiData = buildApiPayload(formData, false);
+            const apiData = buildApiPayload(submitFormData, false);
             console.log("Full API Payload:", JSON.stringify(apiData, null, 2));
             console.log("Car Brand Key being sent:", apiData.carBrand);
             console.log("Available Vehicle Makers in picklist:", picklistData.vehicleMakers);
@@ -958,7 +986,7 @@ const VehicleAddForm = () => {
                     isVisible={showSuccessPopup}
                     onClose={() => setShowSuccessPopup(false)}
                     image={vectorImage}
-                    message={t("vehicleCreatedSuccess")}
+                    message={isEditMode ? t("vehicleUpdatedSuccess") : t("vehicleCreatedSuccess")}
                 />
                 <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} />
             </div>

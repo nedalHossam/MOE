@@ -53,20 +53,16 @@ const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoadin
         }
     };
 
-    // Track if status should remain editable during this edit session
-    const [canEditStatus, setCanEditStatus] = useState(false);
-
-    useEffect(() => {
-        const isDraft = String(formData.vehicleStatus || "").toLowerCase() === "draft";
-        if (isEditMode && isDraft) {
-            setCanEditStatus(true);
-        }
-    }, [isEditMode, formData.vehicleStatus]);
+    // Status should be readonly in edit mode
+    const isStatusReadonly = isEditMode;
+    
+    // Check if status is draft (for filtering options)
+    const isDraftStatus = String(formData.vehicleStatus || "").toLowerCase() === "draft";
 
     // Compute status options: in edit mode with Draft status, hide OnTrip and InMaintenance
     const statusOptions = (() => {
         const original = Array.isArray(picklistData.status) ? picklistData.status : [];
-        const isDraftEdit = isEditMode && String(formData.vehicleStatus || "").toLowerCase() === "draft";
+        const isDraftEdit = isEditMode && isDraftStatus;
         if (!isDraftEdit) return original;
         const blocked = new Set(["ontrip", "inmaintenance"]);
         return original.filter((opt) => {
@@ -87,7 +83,7 @@ const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoadin
                         value={formData.vehicleStatus}
                         onChange={(value) => handleSelectChangeWithI18n("vehicleStatus", value)}
                         isLoading={optionsLoading}
-                        isDisabled={optionsLoading || isLoading || !(isEditMode && canEditStatus)}
+                        isDisabled={optionsLoading || isLoading || isStatusReadonly}
                         placeholder={t("statusPlaceholder")}
                         isMulti={false}
                         currentLanguage={currentLanguage}
