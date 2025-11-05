@@ -191,7 +191,7 @@ export const getVehicleById = async (vehicleId) => {
     }
 };
 
-export const getVehicleList = async (page, pageSize , search = '') => {
+export const getVehicleList = async (page, pageSize , search = '', sort = null, filters = {}) => {
     try {
         const urlParams = new URLSearchParams();
         urlParams.append('page', page);
@@ -200,6 +200,71 @@ export const getVehicleList = async (page, pageSize , search = '') => {
         // Add search parameter if provided
         if (search && search.trim()) {
             urlParams.append('search', search.trim());
+        }
+        
+        // Add sort parameter if provided (format: field:order, e.g., "id:asc" or "plateNumber:desc")
+        if (sort) {
+            urlParams.append('sort', sort);
+        }
+        
+        // Build filter query string
+        const filterExpressions = [];
+        
+        // Map filter fields to API field names
+        const filterFieldMap = {
+            status: 'vehicleStatus',
+            brand: 'carBrand',
+            model: 'carModel',
+            category: 'carCategory',
+            location: 'currentLocation',
+            department: 'department'
+        };
+        
+        // Add simple equality filters
+        Object.keys(filterFieldMap).forEach((filterKey) => {
+            if (filters[filterKey] && filters[filterKey].trim()) {
+                const apiField = filterFieldMap[filterKey];
+                filterExpressions.push(`${apiField} eq '${filters[filterKey].trim()}'`);
+            }
+        });
+        
+        // Add year range filter (carYear)
+        if (filters.yearFrom || filters.yearTo) {
+            if (filters.yearFrom && filters.yearTo) {
+                filterExpressions.push(`carYear ge ${filters.yearFrom} and carYear le ${filters.yearTo}`);
+            } else if (filters.yearFrom) {
+                filterExpressions.push(`carYear ge ${filters.yearFrom}`);
+            } else if (filters.yearTo) {
+                filterExpressions.push(`carYear le ${filters.yearTo}`);
+            }
+        }
+        
+        // Add registration expiry date range filter
+        if (filters.registrationExpiryFrom || filters.registrationExpiryTo) {
+            if (filters.registrationExpiryFrom && filters.registrationExpiryTo) {
+                filterExpressions.push(`registrationExpiryDate ge ${filters.registrationExpiryFrom} and registrationExpiryDate le ${filters.registrationExpiryTo}`);
+            } else if (filters.registrationExpiryFrom) {
+                filterExpressions.push(`registrationExpiryDate ge ${filters.registrationExpiryFrom}`);
+            } else if (filters.registrationExpiryTo) {
+                filterExpressions.push(`registrationExpiryDate le ${filters.registrationExpiryTo}`);
+            }
+        }
+        
+        // Add insurance expiry date range filter
+        if (filters.insuranceExpiryFrom || filters.insuranceExpiryTo) {
+            if (filters.insuranceExpiryFrom && filters.insuranceExpiryTo) {
+                filterExpressions.push(`insuranceExpiryDate ge ${filters.insuranceExpiryFrom} and insuranceExpiryDate le ${filters.insuranceExpiryTo}`);
+            } else if (filters.insuranceExpiryFrom) {
+                filterExpressions.push(`insuranceExpiryDate ge ${filters.insuranceExpiryFrom}`);
+            } else if (filters.insuranceExpiryTo) {
+                filterExpressions.push(`insuranceExpiryDate le ${filters.insuranceExpiryTo}`);
+            }
+        }
+        
+        // Add filter parameter if we have any filter expressions
+        if (filterExpressions.length > 0) {
+            const filterQuery = filterExpressions.join(' and ');
+            urlParams.append('filter', filterQuery);
         }
         
         const response = await api(`o/c/vehicles?${urlParams.toString()}`);

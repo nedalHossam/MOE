@@ -9,6 +9,7 @@ import { useTranslation } from "../../../utils/translations";
 import { Table, SearchInput, Button } from "../../../components/ui";
 import ClayIcon from "@clayui/icon";
 import { getVehicleList } from "../hooks/api";
+import FilterForm from "./components/filter-form";
 
 const VehicleList = () => {
     const { t, currentLanguage, direction } = useTranslation();
@@ -25,6 +26,7 @@ const VehicleList = () => {
     const [tablePageSize, setTablePageSize] = useState(2);
     const [tableSort, setTableSort] = useState(null);
     const [showFilter, setShowFilter] = useState(false);
+    const [filters, setFilters] = useState({});
     const spritemap = `${Liferay.ThemeDisplay.getPathThemeImages()}/clay/icons.svg`;
     const isInitializedRef = useRef(false);
     const lastPageRef = useRef(1); // Track the last page to prevent unwanted resets
@@ -77,7 +79,7 @@ const VehicleList = () => {
         setTablePage(page);
         lastPageRef.current = page; // Initialize ref
 
-        // Initialize sort from URL
+        // Initialize sort from URL using sortBy and sortOrder parameters
         const sortByParam = urlParams.get('sortBy');
         const sortOrderParam = urlParams.get('sortOrder');
         if (sortByParam) {
@@ -104,13 +106,32 @@ const VehicleList = () => {
             // Warn if page resets unexpectedly (from a non-1 value back to 1, or any other unexpected change)
             if (previousPage > 1 && tablePage === 1 && previousPage !== tablePage) {
                 console.warn(`⚠️ tablePage unexpectedly reset from ${previousPage} to 1! Check stack trace above.`);
+                console.trace('Stack trace for unexpected reset:');
             }
-            // Update ref after logging
+            // Update ref after logging - but only if the change is valid
+            // If we're resetting to 1 from a higher page, check if it was intentional
+            if (previousPage > 1 && tablePage === 1) {
+                // This might be intentional (search, sort, pageSize change), so we'll allow it
+                // but log it for debugging
+                console.log(`Page reset to 1 from ${previousPage} - this may be intentional (search/sort/pageSize change)`);
+            }
             lastPageRef.current = tablePage;
         }
     }, [tablePage]);
 
     // Sync from URL changes (browser back/forward)
+    // Use a ref to track tablePage to avoid stale closures
+    const tablePageRef = useRef(tablePage);
+    useEffect(() => {
+        tablePageRef.current = tablePage;
+    }, [tablePage]);
+
+    // Use refs to track sort state to avoid stale closures
+    const tableSortRef = useRef(tableSort);
+    useEffect(() => {
+        tableSortRef.current = tableSort;
+    }, [tableSort]);
+
     useEffect(() => {
         if (!isInitializedRef.current) {
             return;
@@ -121,18 +142,69 @@ const VehicleList = () => {
             const pageParam = urlParams.get('page');
             if (pageParam) {
                 const parsedPage = parseInt(pageParam, 10);
-                if (!isNaN(parsedPage) && parsedPage > 0 && parsedPage !== tablePage) {
-                    console.log(`Browser navigation detected: syncing page from URL to ${parsedPage}`);
+                const currentPage = tablePageRef.current;
+                // Only sync if page is valid and different from current
+                if (!isNaN(parsedPage) && parsedPage > 0 && parsedPage !== currentPage) {
+                    console.log(`Browser navigation detected: syncing page from URL ${parsedPage} (current: ${currentPage})`);
+                    lastPageRef.current = parsedPage;
                     setTablePage(parsedPage);
                 }
+            }
+            
+            // Sync sort from URL on browser navigation (using sortBy and sortOrder)
+            const sortByParam = urlParams.get('sortBy');
+            const sortOrderParam = urlParams.get('sortOrder');
+            const currentSort = tableSortRef.current;
+            if (sortByParam) {
+                const newSort = { 
+                    column: sortByParam, 
+                    direction: sortOrderParam || 'ascending' 
+                };
+                // Only update if different from current
+                if (!currentSort || currentSort.column !== newSort.column || currentSort.direction !== newSort.direction) {
+                    console.log(`Browser navigation detected: syncing sort from URL sortBy=${sortByParam}, sortOrder=${sortOrderParam}`);
+                    setTableSort(newSort);
+                }
+            } else if (currentSort) {
+                // Clear sort if not in URL
+                console.log(`Browser navigation detected: clearing sort (not in URL)`);
+                setTableSort(null);
             }
         };
 
         window.addEventListener('popstate', handlePopState);
         return () => window.removeEventListener('popstate', handlePopState);
-    }, [tablePage]);
+    }, []);
 
-    // Fetch vehicle data when page, pageSize, or search changes
+    // Map table column keys to API field names for sorting
+    const mapColumnToApiField = (columnKey) => {
+        const columnToApiFieldMap = {
+            'vehicleNumber': 'id', // vehicleNumber is derived from id
+            'plateNumber': 'plateNumber',
+            'brandModel': 'carBrand', // Sort by brand first, can be changed to carModel if needed
+            'year': 'carYear',
+            'category': 'carCategory',
+            'registrationNumber': 'registrationNumber',
+            'insuranceExpiryDate': 'insuranceExpiryDate',
+            'location': 'currentLocation', // Can be changed to carLocationHome if needed
+            'status': 'vehicleStatus'
+        };
+        return columnToApiFieldMap[columnKey] || columnKey;
+    };
+
+    // Helper function to convert tableSort format to API sort format
+    const getSortParam = (sort) => {
+        if (!sort || !sort.column) {
+            return null;
+        }
+        // Map table column key to API field name
+        const apiField = mapColumnToApiField(sort.column);
+        // Convert table format (ascending/descending) to API format (asc/desc)
+        const order = sort.direction === 'descending' ? 'desc' : 'asc';
+        return `${apiField}:${order}`;
+    };
+
+    // Fetch vehicle data when page, pageSize, search, or sort changes
     useEffect(() => {
         // Skip if component hasn't initialized yet
         if (!isInitializedRef.current) {
@@ -148,8 +220,9 @@ const VehicleList = () => {
                 const currentPage = tablePage || 1;
                 const currentPageSize = tablePageSize || 2;
                 const currentSearch = searchValue || '';
-                console.log(`Fetching vehicles with page=${currentPage}, pageSize=${currentPageSize}, search=${currentSearch}`);
-                const response = await getVehicleList(currentPage, currentPageSize, currentSearch);
+                const sortParam = getSortParam(tableSort);
+                console.log(`Fetching vehicles with page=${currentPage}, pageSize=${currentPageSize}, search=${currentSearch}, sort=${sortParam}, filters=`, filters);
+                const response = await getVehicleList(currentPage, currentPageSize, currentSearch, sortParam, filters);
                 setVehicles(response.items || []);
                 // Always use the requested page, not what the API returns (to prevent resets)
                 setPagination({
@@ -171,7 +244,7 @@ const VehicleList = () => {
 
         fetchVehicles();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tablePage, tablePageSize, searchValue]);
+    }, [tablePage, tablePageSize, searchValue, tableSort, filters]);
 
     // Helper function to get localized value from i18n object
     const getLocalizedValue = (field, currentLang = currentLanguage) => {
@@ -339,17 +412,11 @@ const VehicleList = () => {
             return;
         }
         
-        // Update ref to track intended page
+        // Update ref to track intended page BEFORE state update
         lastPageRef.current = page;
         
-        // Update state first
+        // Update state - Pagination component already handles URL update
         setTablePage(page);
-        
-        // Ensure URL is in sync (Pagination component also updates it, but this ensures consistency)
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('page', page);
-        const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
-        window.history.replaceState({}, '', newUrl);
         
         console.log(`After handleTablePageChange: setTablePage(${page}) called`);
     };
@@ -365,8 +432,29 @@ const VehicleList = () => {
     };
 
     const handleTableSortChange = (sort) => {
+        // Update sort state
         setTableSort(sort);
+        // Reset to page 1 when sort changes
         setTablePage(1);
+        lastPageRef.current = 1;
+        
+        // Update URL with sortBy and sortOrder parameters (not sort parameter)
+        const urlParams = new URLSearchParams(window.location.search);
+        if (sort && sort.column) {
+            urlParams.set('sortBy', sort.column);
+            urlParams.set('sortOrder', sort.direction || 'ascending');
+            // Remove old sort parameter if it exists
+            urlParams.delete('sort');
+        } else {
+            // Remove sort parameters if sort is cleared
+            urlParams.delete('sortBy');
+            urlParams.delete('sortOrder');
+            urlParams.delete('sort');
+        }
+        // Reset page to 1 in URL
+        urlParams.set('page', '1');
+        const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+        window.history.replaceState({}, '', newUrl);
     };
 
     const handleRowAction = (action, row) => {
@@ -388,7 +476,17 @@ const VehicleList = () => {
 
     const handleFilterClick = () => {
         setShowFilter(!showFilter);
-        toast.info(currentLanguage === 'ar-SA' ? 'ميزة التصفية قريباً' : 'Filter feature coming soon');
+    };
+
+    const handleFilterClose = () => {
+        setShowFilter(false);
+    };
+
+    const handleFilterApply = (filterValues) => {
+        setFilters(filterValues);
+        setTablePage(1); // Reset to page 1 when filters change
+        lastPageRef.current = 1;
+        setShowFilter(false);
     };
 
     // Actions menu configuration
@@ -469,8 +567,8 @@ const VehicleList = () => {
                     <Table
                         items={filteredVehicles}
                         columns={vehicleColumns}
-                        page={tablePage}
-                        pageSize={tablePageSize}
+                        page={tablePage || 1}
+                        pageSize={tablePageSize || 2}
                         onPageChange={handleTablePageChange}
                         onPageSizeChange={handleTablePageSizeChange}
                         onSortChange={handleTableSortChange}
@@ -488,6 +586,25 @@ const VehicleList = () => {
                         spritemap={spritemap}
                     />
                 </div>
+
+                {/* Filter Sidebar Overlay */}
+                {showFilter && (
+                    <div 
+                        className={`filter-sidebar-overlay ${showFilter ? 'active' : ''}`}
+                        onClick={handleFilterClose}
+                    />
+                )}
+
+                {/* Filter Sidebar */}
+                {showFilter && (
+                    <FilterForm
+                        onFilter={handleFilterApply}
+                        onClose={handleFilterClose}
+                        currentLanguage={currentLanguage}
+                        direction={direction}
+                        spritemap={spritemap}
+                    />
+                )}
 
                 {/* Toast Container */}
                 <ToastContainer

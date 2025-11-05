@@ -46,7 +46,8 @@ export default function Pagination({
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set('page', page);
     const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
-    window.history.pushState({}, '', newUrl);
+    // Use replaceState to avoid creating unnecessary history entries
+    window.history.replaceState({}, '', newUrl);
   };
 
   const handlePageClick = (page) => {
@@ -91,7 +92,8 @@ export default function Pagination({
     const urlParams = new URLSearchParams(window.location.search);
     urlParams.set('pageSize', newDelta);
     const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
-    window.history.pushState({}, '', newUrl);
+    // Use replaceState to avoid creating unnecessary history entries
+    window.history.replaceState({}, '', newUrl);
 
     // Call the original callback if provided
     if (onDeltaChange) {
