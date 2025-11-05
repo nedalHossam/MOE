@@ -12,7 +12,7 @@ import { SuccessPopup } from "../../../components/ui";
 import vectorImage from "../../../static/images/Vector.svg";
 
 // Import utilities
-import { api, fetchPicklistOptions, getPicklistOptions, fetchAllUsers, fetchDriverDataList, fetchCurrentUser, fetchUserRoles, getVehicleById } from "./hooks/api";
+import { api, getPicklistOptions, fetchAllUsers, fetchDriverDataList, fetchCurrentUser, fetchUserRoles, getVehicleById } from "../hooks/api";
 
 import {
     validateField,
@@ -24,11 +24,11 @@ import {
     validateAllSections,
     computeLicenseStatus,
     computeInsuranceStatus,
-} from "./hooks/validation";
+} from "./utils/validation";
 
 import { locales } from "./constants";
-import { buildApiPayload } from "./hooks/formSubmission";
-import { createInitialFormData } from "./hooks/initialData";
+import { buildApiPayload } from "./utils/formSubmission";
+import { createInitialFormData } from "./utils/initialData";
 import { useFileUpload } from "../../../hooks/useFileUpload";
 
 // Import components
@@ -796,7 +796,7 @@ const VehicleAddForm = () => {
             setShowSuccessPopup(true);
         } catch (error) {
             console.error("Submission error:", error.message);
-            toast.error(t("submissionFailed"));
+            toast.error(error.message);
         } finally {
             setIsLoading(false);
         }
@@ -834,7 +834,7 @@ const VehicleAddForm = () => {
             // Do not reset the form so the user can continue editing if they want
         } catch (error) {
             console.error("Save draft error:", error.message);
-            toast.error(t("saveDraftFailed"));
+            toast.error(error.message);
         } finally {
             setIsLoading(false);
         }

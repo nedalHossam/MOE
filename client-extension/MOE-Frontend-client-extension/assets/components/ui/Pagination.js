@@ -16,19 +16,20 @@ export default function Pagination({
   activeDelta = 10,
   deltas = [],
   onDeltaChange,
+  showItemsPerPage = true,
   ...rest
 }) {
   const pages = Array.from({ length: totalPages }, (_, i) => i + 1);
-  
+
   // Calculate visible pages (show max 5 pages with ellipsis)
   const getVisiblePages = () => {
     if (totalPages <= 5) {
       return pages;
     }
-    
+
     const current = activePage;
     const total = totalPages;
-    
+
     if (current <= 3) {
       return [1, 2, 3, '...', total];
     } else if (current >= total - 2) {
@@ -40,33 +41,61 @@ export default function Pagination({
 
   const visiblePages = getVisiblePages();
 
+  const updatePageInUrl = (page) => {
+    // Update URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('page', page);
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+    window.history.pushState({}, '', newUrl);
+  };
+
   const handlePageClick = (page) => {
     if (page !== '...' && page !== activePage && onPageChange) {
+      updatePageInUrl(page);
       onPageChange(page);
     }
   };
 
   const handleFirstPage = () => {
     if (activePage > 1 && onPageChange) {
+      updatePageInUrl(1);
       onPageChange(1);
     }
   };
 
   const handlePrevPage = () => {
     if (activePage > 1 && onPageChange) {
-      onPageChange(activePage - 1);
+      const newPage = activePage - 1;
+      updatePageInUrl(newPage);
+      onPageChange(newPage);
     }
   };
 
   const handleNextPage = () => {
     if (activePage < totalPages && onPageChange) {
-      onPageChange(activePage + 1);
+      const newPage = activePage + 1;
+      updatePageInUrl(newPage);
+      onPageChange(newPage);
     }
   };
 
   const handleLastPage = () => {
     if (activePage < totalPages && onPageChange) {
+      updatePageInUrl(totalPages);
       onPageChange(totalPages);
+    }
+  };
+
+  const handleDeltaChange = (newDelta) => {
+    // Update URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    urlParams.set('pageSize', newDelta);
+    const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+    window.history.pushState({}, '', newUrl);
+
+    // Call the original callback if provided
+    if (onDeltaChange) {
+      onDeltaChange(newDelta);
     }
   };
 
@@ -74,12 +103,12 @@ export default function Pagination({
     <Provider spritemap={spritemap}>
       <div className={`pagination-wrapper-enhanced ${className}`}>
         {/* Items per page selector */}
-        {deltas.length > 0 && onDeltaChange && (
+        {showItemsPerPage && deltas.length > 0 && onDeltaChange && (
           <div className="items-per-page">
             <span>Items per page:</span>
             <select
               value={activeDelta}
-              onChange={(e) => onDeltaChange(parseInt(e.target.value))}
+              onChange={(e) => handleDeltaChange(parseInt(e.target.value))}
             >
               {deltas.map(delta => (
                 <option key={delta.label} value={delta.label}>
@@ -170,4 +199,5 @@ Pagination.propTypes = {
   activeDelta: PropTypes.number,
   deltas: PropTypes.array,
   onDeltaChange: PropTypes.func,
-}; 
+  showItemsPerPage: PropTypes.bool,
+};

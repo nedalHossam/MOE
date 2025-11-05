@@ -19,6 +19,8 @@ import Pagination from './Pagination';
  * @param {Array} [actions] - Array of action objects: { key, label, icon? }
  * @param {boolean} [showActions] - Whether to show actions column
  * @param {function} [onRowAction] - Callback for row actions
+ * @param {Object} [sort] - Controlled sort state: { column, direction }
+ * @param {function} [onSortChange] - Callback for sort change: (sort) => void
  */
 export default function Table({
     items,
@@ -36,25 +38,52 @@ export default function Table({
     ],
     showActions = true,
     onRowAction,
+    sort: controlledSort,
+    onSortChange,
 }) {
     // Ensure spritemap is properly formatted
     const finalSpritemap = spritemap || '/o/classic-theme/images/lexicon/icons.svg';
-    
+
     // Debug: Log the spritemap being used
     console.log('Table spritemap:', finalSpritemap);
-    const [sort, setSort] = useState(null);
+    const [internalSort, setInternalSort] = useState(null);
     const [internalPage, setInternalPage] = useState(1);
     const [internalPageSize, setInternalPageSize] = useState(10);
     const [showContextMenu, setShowContextMenu] = useState(null);
 
+    const sort = controlledSort !== undefined ? controlledSort : internalSort;
     const page = controlledPage || internalPage;
     const pageSize = controlledPageSize || internalPageSize;
     const handlePageChange = onPageChange || setInternalPage;
     const handlePageSizeChange = onPageSizeChange || setInternalPageSize;
 
+    const handleSortChange = (newSort) => {
+        // Update URL query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        if (newSort && newSort.column) {
+            urlParams.set('sortBy', newSort.column);
+            urlParams.set('sortOrder', newSort.direction || 'ascending');
+        } else {
+            urlParams.delete('sortBy');
+            urlParams.delete('sortOrder');
+        }
+        const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+        window.history.pushState({}, '', newUrl);
+
+        // Update internal state if not controlled
+        if (controlledSort === undefined) {
+            setInternalSort(newSort);
+        }
+
+        // Call parent callback if provided
+        if (onSortChange) {
+            onSortChange(newSort);
+        }
+    };
+
     const filteredItems = useMemo(() => {
         let filtered = items;
-        
+
         // Apply sorting
         if (sort) {
             filtered = [...filtered].sort((a, b) => {
@@ -66,7 +95,7 @@ export default function Table({
                 return cmp;
             });
         }
-        
+
         return filtered;
     }, [sort, items]);
 
@@ -108,11 +137,11 @@ export default function Table({
             <div className="table-container">
                 {/* Table */}
                 <div className="table-wrapper">
-                    <ClayTable onSortChange={setSort} sort={sort} spritemap={finalSpritemap}>
+                    <ClayTable onSortChange={handleSortChange} sort={sort} spritemap={finalSpritemap}>
                         <Head className="table-header">
                             {columns.map(col => (
-                                <Cell 
-                                    key={col.key} 
+                                <Cell
+                                    key={col.key}
                                     sortable={col.sortable}
                                     className="table-header-cell"
                                 >
@@ -127,12 +156,12 @@ export default function Table({
                         </Head>
                         <Body defaultItems={pagedItems}>
                             {(row, index) => (
-                                <Row 
+                                <Row
                                     key={row.id || index}
                                     className="table-row"
                                 >
                                     {columns.map(col => (
-                                        <Cell 
+                                        <Cell
                                             key={col.key}
                                             className="table-cell"
                                         >
@@ -164,8 +193,7 @@ export default function Table({
                                                                 className="context-menu-item"
                                                                 onClick={() => handleRowAction(action.key, row)}
                                                             >
-                                                                {action.icon && <span className="action-icon">{action.icon}</span>}
-                                                                {action.label}
+                                                               {action.label}
                                                             </button>
                                                         ))}
                                                     </div>
@@ -189,6 +217,7 @@ export default function Table({
                         activeDelta={pageSize}
                         deltas={paginationDeltas}
                         onDeltaChange={handlePageSizeChange}
+                        showItemsPerPage={false}
                     />
                 </div>
             </div>
@@ -197,4 +226,4 @@ export default function Table({
 
     </Provider>
     );
-} 
+}

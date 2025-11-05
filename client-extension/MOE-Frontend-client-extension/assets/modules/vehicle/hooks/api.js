@@ -190,3 +190,45 @@ export const getVehicleById = async (vehicleId) => {
         return null;
     }
 };
+
+export const getVehicleList = async (page, pageSize , search = '') => {
+    try {
+        const urlParams = new URLSearchParams();
+        urlParams.append('page', page);
+        urlParams.append('pageSize', pageSize);
+        
+        // Add search parameter if provided
+        if (search && search.trim()) {
+            urlParams.append('search', search.trim());
+        }
+        
+        const response = await api(`o/c/vehicles?${urlParams.toString()}`);
+        if (!response.ok) {
+            throw new Error("Failed to fetch vehicle data list");
+        }
+        const data = await response.json();
+        console.log("vehicle list", data);
+        
+        // Return both items and pagination metadata
+        return {
+            items: data.items || [],
+            pagination: {
+                page: data.page || page,
+                pageSize: data.pageSize || pageSize,
+                lastPage: data.lastPage || 1,
+                totalCount: data.totalCount || 0
+            }
+        };
+    } catch (error) {
+        console.error("Error fetching vehicle data list:", error);
+        return {
+            items: [],
+            pagination: {
+                page: page,
+                pageSize: pageSize,
+                lastPage: 1,
+                totalCount: 0
+            }
+        };
+    }
+};

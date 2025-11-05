@@ -1,5 +1,6 @@
 import React from "react";
-import FormField from "../FormField/FormField";
+import TextInput from "../../../../components/ui/TextInput"
+import CustomLocalizedInput from "../../../../components/ui/CustomLocalizedInput"
 
 const ContactInfoSection = ({
     formData,
@@ -8,6 +9,8 @@ const ContactInfoSection = ({
     validateField,
     formTouched,
     setFormTouched,
+    t,
+    spritemap,
     isLoading,
     locales,
     localizedInputLocales,
@@ -17,14 +20,18 @@ const ContactInfoSection = ({
 }) => {
     return (
         <div id="contact-info" className="form-section">
-            <h3 className="section-title">Section B: Contact information</h3>
-            <div className="form-grid form-grid-2">
-                <FormField
-                    type="text"
-                    label="Phone Number"
-                    name="phoneNumber"
+            <div className="form-grid form-grid-3">
+                {/* <div className="full-row"> */}
+                <TextInput
+                    label={t("PhoneNumber")}
                     value={formData.phoneNumber}
-                    onChange={(value) => setField("phoneNumber", value)}
+                    onChange={(e) => setField("phoneNumber", e.target.value)}
+                    error={errors.phoneNumber}
+                    placeholder={t("PhoneNumberPlaceHolder")}
+                    required={true}
+                    name="phoneNumber"
+                    spritemap={spritemap}
+                    errorIcon="exclamation-full"
                     onBlur={() => {
                         if (!formTouched.phoneNumber) {
                             setFormTouched((prev) => ({ ...prev, phoneNumber: true }));
@@ -36,17 +43,17 @@ const ContactInfoSection = ({
                             setFormTouched((prev) => ({ ...prev, phoneNumber: true }));
                         }
                     }}
-                    error={errors.phoneNumber}
-                    placeholder="Enter phone number"
-                    required={true}
                 />
-
-                <FormField
-                    type="text"
-                    label="Email"
-                    name="email"
+                <TextInput
+                    label={t("email")}
                     value={formData.email}
-                    onChange={(value) => setField("email", value)}
+                    onChange={(e) => setField("email", e.target.value)}
+                    error={errors.email}
+                    placeholder={t("email")}
+                    required={true}
+                    name="email"
+                    spritemap={spritemap}
+                    errorIcon="exclamation-full"
                     onBlur={() => {
                         if (!formTouched.email) {
                             setFormTouched((prev) => ({ ...prev, email: true }));
@@ -58,80 +65,143 @@ const ContactInfoSection = ({
                             setFormTouched((prev) => ({ ...prev, email: true }));
                         }
                     }}
-                    error={errors.email}
-                    placeholder="Enter email address"
-                    required={true}
+                />
+                <CustomLocalizedInput
+                    className="address-test"
+                    name="address_i18n"
+                    label={t("address")}
+                    locales={locales}
+                    selectedLocale={getLocaleObject(localizedInputLocales.address_i18n)}
+                    onSelectedLocaleChange={(newLocale) =>
+                        handleLocalizedInputLocaleChange("address_i18n", newLocale)
+                    }
+                    onTranslationsChange={(translations) =>
+                        handleLocalizedInputChange("address_i18n", translations)
+                    }
+                    onBlur={() => {
+                        if (!formTouched.address_i18n) {
+                            setFormTouched((prev) => ({ ...prev, address_i18n: true }));
+                        }
+                        validateField("address_i18n", formData.address_i18n);
+                    }}
+                    onFocus={() => {
+                        if (!formTouched.address_i18n) {
+                            setFormTouched((prev) => ({ ...prev, address_i18n: true }));
+                        }
+                    }}
+                    translations={formData.address_i18n}
+                    disabled={isLoading}
+                    placeholder={t("address")}
+                    symbol="home"
+                    // rows={3}
+                    // component="textarea"
+                    required
+                    error={errors.address_i18n}
                 />
 
-                <div className="full-row">
-                    <FormField
-                        type="localized"
-                        name="address_i18n"
-                        label="Address"
-                        locales={locales}
-                        selectedLocale={getLocaleObject(localizedInputLocales.address)}
-                        onSelectedLocaleChange={(newLocale) => handleLocalizedInputLocaleChange("address", newLocale)}
-                        onTranslationsChange={(translations) => handleLocalizedInputChange("address_i18n", translations)}
-                        translations={formData.address_i18n}
-                        disabled={isLoading}
-                        error={errors.address}
-                        placeholder="Enter address"
-                        symbol="home"
-                    />
-                </div>
-            </div>
-
-            <h4>Emergency contact</h4>
-            <div className="form-grid form-grid-2">
-                <FormField
-                    type="localized"
+                <CustomLocalizedInput
                     name="emergencyContactName_i18n"
-                    label="Emergency Contact Name"
+                    label={t("emergencyContactName")}
                     locales={locales}
-                    selectedLocale={getLocaleObject(localizedInputLocales.emergencyContactName)}
-                    onSelectedLocaleChange={(newLocale) => handleLocalizedInputLocaleChange("emergencyContactName", newLocale)}
-                    onTranslationsChange={(translations) => handleLocalizedInputChange("emergencyContactName_i18n", translations)}
+                    selectedLocale={getLocaleObject(localizedInputLocales.emergencyContactName_i18n)}
+                    onSelectedLocaleChange={(newLocale) =>
+                        handleLocalizedInputLocaleChange("emergencyContactName_i18n", newLocale)
+                    }
+                    onTranslationsChange={(translations) =>
+                        handleLocalizedInputChange("emergencyContactName_i18n", translations)
+                    }
+                    onBlur={() => {
+                        if (!formTouched.emergencyContactName_i18n) {
+                            setFormTouched((prev) => ({ ...prev, emergencyContactName_i18n: true }));
+                        }
+                        validateField("emergencyContactName_i18n", formData.emergencyContactName_i18n);
+                    }}
+                    onFocus={() => {
+                        if (!formTouched.emergencyContactName_i18n) {
+                            setFormTouched((prev) => ({ ...prev, emergencyContactName_i18n: true }));
+                        }
+                    }}
                     translations={formData.emergencyContactName_i18n}
                     disabled={isLoading}
-                    error={errors.emergencyContactName}
-                    placeholder="Enter emergency contact name"
+                    placeholder={t("emergencyContactNamePlaceHolder")}
                     symbol="user"
+                    error={errors.emergencyContactName_i18n}
                 />
 
-                <FormField
-                    type="text"
-                    label="Emergency Contact Phone"
-                    name="emergencyContactPhone"
-                    value={formData.emergencyContactPhone}
-                    onChange={(value) => setField("emergencyContactPhone", value)}
-                    error={errors.emergencyContactPhone}
-                    placeholder="Enter emergency contact phone"
-                />
-
-                <FormField
-                    type="text"
-                    label="Emergency Contact Email"
-                    name="emergencyContactEmail"
+                <TextInput
+                    label={t("emergencyContacEmail")}
+                    style={{ marginTop: '2.5%' }}
                     value={formData.emergencyContactEmail}
-                    onChange={(value) => setField("emergencyContactEmail", value)}
+                    onChange={(e) => setField("emergencyContactEmail", e.target.value)}
                     error={errors.emergencyContactEmail}
-                    placeholder="Enter emergency contact email"
+                    placeholder={t("emergencyContactNamePlaceHolder")}
+                    onBlur={() => {
+                        if (!formTouched.emergencyContactEmail) {
+                            setFormTouched((prev) => ({ ...prev, emergencyContactEmail: true }));
+                        }
+                        validateField("emergencyContactEmail", formData.emergencyContactEmail);
+                    }}
+                    onFocus={() => {
+                        if (!formTouched.emergencyContactEmail) {
+                            setFormTouched((prev) => ({ ...prev, emergencyContactEmail: true }));
+                        }
+                    }}
+                    name="emergencyContactEmail"
+
+                    spritemap={spritemap}
+                    errorIcon="exclamation-full"
                 />
 
-                <FormField
-                    type="localized"
+                <CustomLocalizedInput
                     name="emergencyContactAddress_i18n"
-                    label="Emergency Contact Address"
+                    label={t("emergencyContactAddress")}
                     locales={locales}
-                    selectedLocale={getLocaleObject(localizedInputLocales.emergencyContactAddress)}
-                    onSelectedLocaleChange={(newLocale) => handleLocalizedInputLocaleChange("emergencyContactAddress", newLocale)}
-                    onTranslationsChange={(translations) => handleLocalizedInputChange("emergencyContactAddress_i18n", translations)}
+                    selectedLocale={getLocaleObject(localizedInputLocales.emergencyContactAddress_i18n)}
+                    onSelectedLocaleChange={(newLocale) => handleLocalizedInputLocaleChange("emergencyContactAddress_i18n", newLocale)}
+                    onTranslationsChange={(translations) =>
+                        handleLocalizedInputChange("emergencyContactAddress_i18n", translations)
+                    }
                     translations={formData.emergencyContactAddress_i18n}
                     disabled={isLoading}
-                    error={errors.emergencyContactAddress}
-                    placeholder="Enter emergency contact address"
+                    placeholder={t("emergencyContactAddressPlaceHolder")}
                     symbol="home"
+                    onBlur={() => {
+                        if (!formTouched.emergencyContactAddress_i18n) {
+                            setFormTouched((prev) => ({ ...prev, emergencyContactAddress_i18n: true }));
+                        }
+                        validateField("emergencyContactAddress_i18n", formData.emergencyContactAddress_i18n);
+                    }}
+                    onFocus={() => {
+                        if (!formTouched.emergencyContactAddress_i18n) {
+                            setFormTouched((prev) => ({ ...prev, emergencyContactAddress_i18n: true }));
+                        }
+                    }}
+                    // rows={3}
+                    // component="textarea"
+                    error={errors.emergencyContactAddress_i18n}
                 />
+                <TextInput
+                    label={t("emergencyContacPhone")}
+                    value={formData.emergencyContactPhone}
+                    onChange={(e) => setField("emergencyContactPhone", e.target.value)}
+                    error={errors.emergencyContactPhone}
+                    placeholder={t("emergencyContactPhonePlaceHolder")}
+                    name="emergencyContactPhone"
+                    spritemap={spritemap}
+                    errorIcon="exclamation-full"
+                    onBlur={() => {
+                        if (!formTouched.emergencyContactPhone) {
+                            setFormTouched((prev) => ({ ...prev, emergencyContactPhone: true }));
+                        }
+                        validateField("emergencyContactPhone", formData.emergencyContactPhone);
+                    }}
+                    onFocus={() => {
+                        if (!formTouched.emergencyContactPhone) {
+                            setFormTouched((prev) => ({ ...prev, emergencyContactPhone: true }));
+                        }
+                    }}
+                />
+
             </div>
         </div>
     );

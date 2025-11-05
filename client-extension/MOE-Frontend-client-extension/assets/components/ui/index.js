@@ -13,6 +13,7 @@ export { default as NavigationBar } from './NavigationBar';
 export { default as Pagination } from './Pagination';
 export { default as RadioButton } from './RadioButton';
 export { default as RichTextEditor } from './RichTextEditor';
+export { default as SearchInput } from './SearchInput';
 export { default as Steps } from './Steps';
 export { default as SuccessPopup } from './SuccessPopup';
 export { default as Table } from './Table';

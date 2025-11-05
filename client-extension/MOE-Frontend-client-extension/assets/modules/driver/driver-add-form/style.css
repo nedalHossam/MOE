@@ -1,687 +1,1223 @@
 /* Main Container */
-.driver-add-form {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 20px;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background: #f8f9fa;
+.form-wrapper {
+  padding: var(--spacer-5) var(--spacer-3);
+  font-family: var(--font-family-base);
   min-height: 100vh;
-  border-radius: 8px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  background-color: var(--gray-200);
 }
+
 /* Form Header */
-.form-header {
-  margin-bottom: 30px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
+.form-wrapper .form-header {
+  margin-bottom: var(--spacer-5);
+  padding: 0;
+  background: transparent;
+  text-align: start;
+  border: none;
+  box-shadow: none;
 }
 
-.form-header h1 {
-  margin: 0 0 10px 0;
-  color: #2c3e50;
-  font-size: 28px;
-  font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.form-wrapper .form-header h1 {
+  margin: 0 0 var(--spacer-2) 0;
+  color: var(--gray-900);
+  font-size: var(--h1-font-size);
+  font-weight: var(--font-weight-semi-bold);
+  display: block;
 }
 
-.form-header p {
+.form-wrapper .form-header p {
   margin: 0;
-  color: #6c757d;
-  font-size: 16px;
+  color: var(--gray-500);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
 }
 
-/* Form Sections Container */
-.form-sections-container {
+/* Multi-Step Navigation */
+.form-wrapper .multi-step-nav {
+  padding: var(--spacer-4) 0px;
+  margin-bottom: 0px;
+}
+
+.form-wrapper .multi-step-nav-container {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0;
+  flex-wrap: wrap;
+  position: relative;
+  width: 100%;
+  max-width: none;
+}
+
+
+
+/* RTL Support for step navigation */
+.form-wrapper [dir="rtl"] .multi-step-nav-container,
+.form-wrapper .multi-step-nav[dir="rtl"] .multi-step-nav-container,
+.form-wrapper .multi-step-nav.rtl .multi-step-nav-container {
+  flex-direction: row-reverse;
+}
+
+.form-wrapper [dir="rtl"] .multi-step-nav-item::before,
+.form-wrapper .multi-step-nav[dir="rtl"] .multi-step-nav-item::before,
+.form-wrapper .multi-step-nav.rtl .multi-step-nav-item::before {
+  right: auto !important;
+  left: 63% !important;
+}
+
+.form-wrapper .multi-step-nav-item {
   display: flex;
   flex-direction: column;
-  gap: 30px;
-}
-
-/* Form Section Cards */
-.form-section {
-  background-color: #fff;
-  padding: 25px;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-}
-
-/* Section Headers */
-.section-title {
-  margin: 0 0 20px 0;
-  color: #2c3e50;
-  font-size: 20px;
-  font-weight: 600;
-  padding: 8px 0 8px 16px;
-  border-inline-start: 4px solid #007bff;
-  background-color: #f8f9fa;
-  border-radius: 4px;
-}
-
-/* Section-specific colored borders */
-.user-section {
-  border-inline-start-color: #007bff;
-  background-color: rgba(0, 123, 255, 0.05);
-}
-
-.phone-section {
-  border-inline-start-color: #28a745;
-  background-color: rgba(40, 167, 69, 0.05);
-}
-
-.license-section {
-  border-inline-start-color: #ffc107;
-  background-color: rgba(255, 193, 7, 0.05);
-}
-
-.settings-section {
-  border-inline-start-color: #6f42c1;
-  background-color: rgba(111, 66, 193, 0.05);
-}
-
-.attachment-section {
-  border-inline-start-color: #dc3545;
-  background-color: rgba(220, 53, 69, 0.05);
-}
-
-/* Submit Button Container */
-.form-submit-container {
-  margin-top: 30px;
-  padding: 20px;
-  background-color: #fff;
-  border-radius: 8px;
-  border: 1px solid #e9ecef;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  align-items: center;
+  gap: var(--spacer-2);
+  padding: 0;
+  border-radius: 0;
+  cursor: pointer;
+  transition: var(--transition-base);
+  background-color: transparent;
+  border: none;
+  min-width: auto;
+  justify-content: center;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-normal);
+  color: var(--gray-600);
+  flex: 1;
+  position: relative;
   text-align: center;
+  z-index: 2;
 }
 
-.submit-button {
-  padding: 12px 40px;
+.form-wrapper .multi-step-nav-item:hover {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--gray-700);
+}
+
+.form-wrapper .multi-step-nav-item.active {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--gray-900);
+}
+
+.form-wrapper .multi-step-nav-item.completed {
+  background-color: transparent;
+  border-color: transparent;
+  color: var(--gray-900);
+}
+
+.form-wrapper .multi-step-nav-indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
   font-size: 16px;
   font-weight: 600;
-  border-radius: 6px;
-  min-width: 200px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0 auto;
+  flex-shrink: 0;
+  background: var(--gray-100);
+  color: var(--gray-500);
+  border: 2px solid var(--gray-300);
+  position: relative;
+  z-index: 3;
 }
 
-/* Back Button */
-.back-button-container {
-  margin-bottom: 20px;
+.form-wrapper .multi-step-nav-item.active .multi-step-nav-indicator {
+  background: white;
+  color: black;
+  border-color: var(--primary-main);
+  border: 2px solid var(--primary-main);
 }
 
-.back-button-container button {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: 1px solid #dee2e6;
-  background-color: #fff;
-  color: #495057;
+.form-wrapper .multi-step-nav-item.completed .multi-step-nav-indicator {
+  background: var(--primary-main);
+  color: white;
+  border-color: var(--primary-main);
+}
+
+.form-wrapper .multi-step-nav-check {
+  width: 20px;
+  height: 20px;
+}
+
+.form-wrapper .multi-step-nav-check-fallback {
+  font-size: 16px;
+  font-weight: bold;
+  color: white;
+}
+
+/* Fallback for when ClayIcon doesn't load */
+.form-wrapper .multi-step-nav-check:not([src]) + .multi-step-nav-check-fallback {
+  display: inline !important;
+}
+
+.form-wrapper .multi-step-nav-check:not([src]) {
+  display: none;
+}
+
+.form-wrapper .multi-step-nav-number {
+  font-weight: 600;
+  font-size: 16px;
+}
+
+.form-wrapper .multi-step-nav-title {
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  margin-top: 8px;
+  color: var(--gray-700);
+  line-height: 1.2;
+}
+
+.form-wrapper .multi-step-nav-item.active .multi-step-nav-title {
+  color: var(--gray-900);
+  font-weight: 600;
+}
+
+.form-wrapper .multi-step-nav-item.completed .multi-step-nav-title {
+  color: var(--gray-900);
   font-weight: 500;
 }
 
-/* Back Button */
-.back-button-container {
-  margin-bottom: 24px;
+.form-wrapper .multi-step-nav-divider {
+  display: none;
 }
 
-
-/* Form Sections - Single Card */
-.form-sections-container {
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  padding: 30px;
-  margin-bottom: 20px;
-}
-
-.form-section {
-  display: block;
-  padding: 0;
-  margin-bottom: 0;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  position: relative;
-}
-
-/* Section Dividers */
-.form-section + .form-section {
-  border-top: 1px solid #e0e0e0;
-  margin-top: 30px;
-  padding-top: 30px;
-}
-
-@keyframes slideInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px) scale(0.95);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* Section Titles with Icons */
-.section-title {
-  color: #333;
-  font-size: 20px;
-  font-weight: 600;
-  margin: 0 0 20px 0;
-  border-bottom: 2px solid #e0e0e0;
-  position: relative;
-
-}
-
-.section-title::before {
+/* Progress bar segments - only between steps */
+.form-wrapper .multi-step-nav-item::before {
   content: '';
   position: absolute;
-  left: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 30px;
-  height: 30px;
-  background-size: contain;
-  background-repeat: no-repeat;
-  background-position: center;
+  top: 20px;
+  left: 63%;
+  width: calc(90% - 40px);
+  height: 2px;
+  background: repeating-linear-gradient(to right, var(--gray-300), var(--gray-300) 5px, transparent 5px, transparent 10px);
+  z-index: 1;
+  transition: all 0.3s ease;
 }
 
-/* Section-specific icons */
-.user-section::before {
-  content: '👤';
-  font-size: 24px;
-  width: auto;
-  height: auto;
-  background: none;
+.form-wrapper .multi-step-nav-item:first-child::before {
+  left: 63%;
+  width: calc(80% - 20px);
 }
 
-.phone-section::before {
-  content: '📞';
-  font-size: 24px;
-  width: auto;
-  height: auto;
-  background: none;
+.form-wrapper .multi-step-nav-item:last-child::before {
+  display: none;
 }
 
-.license-section::before {
-  content: '🪪';
-  font-size: 24px;
-  width: auto;
-  height: auto;
-  background: none;
+.form-wrapper .multi-step-nav-item.completed::before {
+  background: var(--primary-main);
 }
 
-.settings-section::before {
-  content: '⚙️';
-  font-size: 24px;
-  width: auto;
-  height: auto;
-  background: none;
+/* RTL Support for progress bar connectors */
+.form-wrapper [dir="rtl"] .multi-step-nav-item::before,
+.form-wrapper .multi-step-nav[dir="rtl"] .multi-step-nav-item::before,
+.form-wrapper .multi-step-nav.rtl .multi-step-nav-item::before {
+  left: auto;
+  right: 63%;
+  background: repeating-linear-gradient(to left, var(--gray-300), var(--gray-300) 5px, transparent 5px, transparent 10px);
 }
 
-.attachment-section::before {
-  content: '📎';
-  font-size: 24px;
-  width: auto;
-  height: auto;
-  background: none;
+.form-wrapper [dir="rtl"] .multi-step-nav-item:first-child::before,
+.form-wrapper .multi-step-nav[dir="rtl"] .multi-step-nav-item:first-child::before,
+.form-wrapper .multi-step-nav.rtl .multi-step-nav-item:first-child::before {
+  right: 63%;
+  left: auto;
+  width: calc(80% - 20px);
 }
 
-.system-fields-section::before {
-  content: '🔧';
-  font-size: 24px;
-  width: auto;
-  height: auto;
-  background: none;
+.form-wrapper [dir="rtl"] .multi-step-nav-item.completed::before,
+.form-wrapper .multi-step-nav[dir="rtl"] .multi-step-nav-item.completed::before,
+.form-wrapper .multi-step-nav.rtl .multi-step-nav-item.completed::before {
+  background: var(--primary-main);
 }
 
-.form-section h4 {
-  color: #555;
-  font-size: 16px;
-  font-weight: 600;
-  margin: 25px 0 15px 0;
-  padding: 0;
-  border-left: 3px solid #007bff;
-  padding-left: 15px;
+/* Step Content */
+.form-wrapper .step-content {
+  padding: 40px;
+  min-height: 400px;
+  margin-bottom: 0px;
 }
 
-/* Form Grid - Basic Two Column Layout */
-.form-grid {
+/* Step Actions */
+.form-wrapper .form-wrapper-steps-action {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 24px 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.form-wrapper .form-wrapper-steps-next-action {
+  display: flex;
+  justify-content: end;
+  gap: 12px;
+  padding: 24px 0;
+  background: transparent;
+  border-radius: 0;
+  border: none;
+  box-shadow: none;
+}
+
+.form-wrapper .css-1u9des2-indicatorSeparator {
+  width: 0px !important;
+}
+
+/* Form Grid */
+.form-wrapper .form-grid {
   display: grid;
-  gap: 20px;
+  gap: 24px;
   align-items: start;
 }
 
-.form-grid-2 {
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+.form-wrapper .form-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
 }
 
-.full-row {
+.form-wrapper .form-grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.form-wrapper .full-row {
   grid-column: 1 / -1;
 }
 
-/* Form Groups - Basic Style */
-.form-grid .clay-form-group {
+.form-wrapper .quarter-row {
+  grid-column: span 3; 
+}
+/* Form Groups */
+.form-wrapper .form-grid .clay-form-group {
   display: flex;
   flex-direction: column;
   margin-bottom: 0;
+  position: relative;
 }
 
-.form-grid label {
+.form-wrapper .form-grid label,
+.form-wrapper .form-label {
   display: block;
-  color: #333;
-  font-size: 14px;
+  color: var(--gray-700);
+  font-size: 13px;
   font-weight: 500;
-  margin-bottom: 8px;
+  margin-bottom: 3px;
+  text-transform: none;
+  letter-spacing: 0;
 }
 
+.form-wrapper .required-asterisk {
+  color: var(--danger);
+  margin-left: 4px;
+}
 
+.form-wrapper .form-container {
+  border-radius: 20px;
+  background-color: white;
+  padding: 20px;
+}
 
-.form-grid input[type="text"],
-.form-grid input[type="email"],
-.form-grid input[type="date"],
-.form-grid input[type="file"],
-.form-grid textarea,
-.form-grid select {
+/* Input Fields */
+.form-wrapper .form-grid input[type="text"],
+.form-wrapper .form-grid input[type="email"],
+.form-wrapper .form-grid input[type="date"],
+.form-wrapper .form-grid input[type="number"],
+.form-wrapper .form-grid input[type="file"],
+.form-wrapper .form-grid textarea,
+.form-wrapper .form-grid select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  border: 1px solid var(--gray-400);
+  border-radius: 8px;
   font-size: 14px;
   background: white;
-  transition: border-color 0.2s ease;
+  transition: all 0.2s ease;
+  color: var(--gray-700);
 }
 
-.form-grid input:focus,
-.form-grid textarea:focus,
-.form-grid select:focus {
+.form-wrapper .form-grid input:focus,
+.form-wrapper .form-grid textarea:focus,
+.form-wrapper .form-grid select:focus {
   outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+  border-color: var(--primary-main);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
 }
 
-.form-grid textarea {
+.form-wrapper .form-grid input::placeholder,
+.form-wrapper .form-grid textarea::placeholder {
+  color: var(--gray-500);
+}
+
+/* Textarea */
+.form-wrapper .form-grid textarea {
   resize: vertical;
   min-height: 100px;
 }
 
-
-
-
-/* Form Errors - Basic Style */
-.form-error {
-  color: #dc3545;
-  font-size: 12px;
-  margin-top: 4px;
-  display: block;
+.form-wrapper .form-grid .form-control {
+  min-height: 44px !important;
 }
 
-.has-error {
-  border-color: #dc3545 !important;
+/* Bootstrap Radio Button Styling - One Column Layout */
+.form-wrapper .btn-group {
+    display: flex;
+    flex-direction: row;
+    gap: 2rem;
+    background-color: #7168DD1A;
+    padding: 2px 40px;
+    border-radius: 8px;
+    width: max-content;
+    margin-bottom: 0.5rem;
 }
 
-.has-error:focus {
-  border-color: #dc3545 !important;
-  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25) !important;
+.form-wrapper .btn-group .form-check {
+  margin: 0;
+  padding: 0;
+  flex: none;
 }
 
-/* File Input - Basic Style */
-input[type="file"] {
-  padding: 8px !important;
-  background: white !important;
-  border: 1px solid #ddd !important;
-  cursor: pointer;
-}
-
-/* Submit Button Container */
-.form-submit-container {
-  text-align: center;
-  margin-top: 30px;
-  padding: 20px;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-.submit-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 12px 24px;
-  font-size: 16px;
-  font-weight: 500;
-  border-radius: 4px;
-  background: #007bff;
-  color: white;
-  border: 1px solid #007bff;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
-}
-
-.submit-button:hover:not(:disabled) {
-  background: #0056b3;
-  border-color: #0056b3;
-}
-
-.submit-button:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
-.spinning {
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-.form-submit-container button[type="submit"] {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 20px 56px;
-  font-size: 18px;
-  font-weight: 700;
-  border: none;
-  border-radius: 16px;
-  cursor: pointer;
-  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: 
-    0 12px 30px rgba(102, 126, 234, 0.3),
-    0 0 0 1px rgba(255, 255, 255, 0.1);
-  letter-spacing: 0.8px;
-  text-transform: uppercase;
+.form-wrapper .btn-group .form-check-input {
   position: relative;
-  overflow: hidden;
-  min-width: 280px;
+  opacity: 1;
+  pointer-events: auto;
+  margin: 0;
+  margin-right: 8px;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
 }
 
-.form-submit-container button[type="submit"]::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-  transition: left 0.6s ease;
+.form-wrapper .btn-group .form-check-label {
+  display: flex;
+  align-items: center;
+  padding: 12px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 48px;
+  font-size: 14px;
+  color: black;
 }
 
-.form-submit-container button[type="submit"]:hover:not(:disabled) {
-  transform: translateY(-3px);
-  box-shadow: 
-    0 16px 40px rgba(102, 126, 234, 0.4),
-    0 0 0 1px rgba(255, 255, 255, 0.2);
+.form-wrapper .btn-group .form-check-label:hover {
+  background: var(--gray-100);
+  border-color: var(--gray-300);
 }
 
-.form-submit-container button[type="submit"]:hover:not(:disabled)::before {
-  left: 100%;
+.form-wrapper .btn-group .form-check-input:checked {
+  background: #e7f3ff;
+  border-color: var(--primary-main);
+  color: var(--primary-main);
 }
 
-.form-submit-container button[type="submit"]:active:not(:disabled) {
-  transform: translateY(-1px);
+/* Checked state */
+.form-wrapper .btn-group .form-check-input:checked {
+  background: var(--primary-main);
+  border-color: var(--primary-main);
+  color: white;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  transform: translateY(-2px);
 }
 
-.form-submit-container button[type="submit"]:disabled {
+.form-wrapper .btn-group .form-check-input:checked {
+  background: var(--primary-400);
+  border-color: var(--primary-400);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+}
+
+/* Focus state */
+.form-wrapper .btn-group .form-check-input:focus {
+  outline: 2px solid var(--primary-main);
+  outline-offset: 2px;
+}
+
+.form-wrapper .btn-group .form-check-input:focus-visible {
+  outline: 2px solid var(--primary-main);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.form-wrapper .btn-group .form-check-input:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  background: var(--gray-100);
+  border-color: var(--gray-300);
+  color: var(--gray-500);
   transform: none;
-  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
 }
 
-/* Loading State */
-.form-submit-container button[type="submit"]:disabled::after {
+.form-wrapper .btn-group .form-check-input:disabled {
+  transform: none;
+  box-shadow: none;
+  border-color: var(--gray-300);
+  background: var(--gray-100);
+}
+
+/* Custom radio button styling */
+.form-wrapper .btn-group .form-check-input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  border: 2px solid var(--gray-400);
+  border-radius: 50%;
+  background: #ffffff;
+  cursor: pointer;
+  position: relative;
+}
+
+.form-wrapper .btn-group .form-check-input[type="radio"]:checked {
+  background: var(--primary-main);
+  border-color: var(--primary-main);
+}
+
+.form-wrapper .btn-group .form-check-input[type="radio"]:checked::after {
   content: '';
   position: absolute;
   top: 50%;
   left: 50%;
-  width: 20px;
-  height: 20px;
-  margin: -10px 0 0 -10px;
-  border: 2px solid rgba(255, 255, 255, 0.3);
-  border-top: 2px solid white;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* React Select - Basic Style */
-.css-control {
-  border-radius: 4px !important;
-  border: 1px solid #ddd !important;
-  background: white !important;
-  transition: border-color 0.2s ease !important;
-}
-
-.css-control:hover {
-  border-color: #ccc !important;
-}
-
-.css-control--is-focused {
-  border-color: rgb(122, 65, 247) !important;
-  box-shadow: 0 0 0 3px rgba(122, 65, 247, 0.1) !important;
-}
-
-/* Select Focus Styles - Global */
-.css-control:focus,
-.css-control:focus-within {
-  border-color: rgb(122, 65, 247) !important;
-  background: white !important;
-  box-shadow: 0 0 0 3px rgba(122, 65, 247, 0.1) !important;
-}
-
-/* Select SVG Icons Color on Focus */
-.css-control--is-focused .css-dropdown-indicator,
-.css-control--is-focused .css-clear-indicator,
-.css-control:focus .css-dropdown-indicator,
-.css-control:focus .css-clear-indicator,
-.css-control:focus-within .css-dropdown-indicator,
-.css-control:focus-within .css-clear-indicator {
-  display: inline-block !important;
-  fill: rgb(122, 65, 247) !important;
-  line-height: 1 !important;
-  stroke: rgb(122, 65, 247) !important;
-  stroke-width: 0 !important;
-  color: rgb(122, 65, 247) !important;
-}
-
-/* Select SVG Icons Color on Focus - Alternative selectors */
-.css-control--is-focused svg,
-.css-control:focus svg,
-.css-control:focus-within svg {
-  display: inline-block !important;
-  fill: rgb(122, 65, 247) !important;
-  line-height: 1 !important;
-  stroke: rgb(122, 65, 247) !important;
-  stroke-width: 0 !important;
-  color: rgb(122, 65, 247) !important;
-}
-
-.css-value-container {
-  padding: 8px 12px !important;
-}
-
-.css-input {
-  font-size: 14px !important;
-}
-
-.css-placeholder {
-  color: #999 !important;
-  font-size: 14px !important;
-}
-
-.css-single-value {
-  color: #333 !important;
-  font-size: 14px !important;
-}
-
-.css-indicator-separator {
-  background-color: #ddd !important;
-}
-
-.css-dropdown-indicator {
-  color: #666 !important;
-}
-
-.css-clear-indicator {
-  color: #666 !important;
-}
-
-/* Read-only Fields - Basic Style */
-input[readonly] {
-  background: #f8f9fa !important;
-  color: #6c757d !important;
-  cursor: not-allowed !important;
-  border-color: #dee2e6 !important;
-}
-
-/* Date Input with Icon */
-.date-input-wrapper {
-  position: relative;
-  width: 100%;
-}
-
-.date-input {
-  width: 100%;
-  padding: 10px 40px 10px 12px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
+  transform: translate(-50%, -50%);
+  width: 6px;
+  height: 6px;
   background: white;
-  transition: border-color 0.2s ease;
+  border-radius: 50%;
 }
 
-.date-input:focus {
-  outline: none;
-  border-color: #007bff;
-  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+.form-wrapper .btn-group .form-check-input[type="radio"]:focus {
+  outline: 2px solid var(--primary-main);
+  outline-offset: 2px;
 }
 
-.date-icon {
-  position: absolute;
-  right: 12px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 16px;
-  color: #666;
-  pointer-events: none;
+/* Icon styling within radio buttons */
+.form-wrapper .btn-group .form-check-label .clay-icon {
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
-/* Responsive Design - Mobile First */
+/* Responsive adjustments */
 @media (max-width: 768px) {
-  .form-sections-container {
-    padding: 20px;
-  }
-
-  .form-grid-2 {
-    grid-template-columns: 1fr;
-    gap: 15px;
-  }
-
-  .section-title {
-    font-size: 18px;
-    padding-left: 35px;
-  }
-
-  .section-title::before {
-    width: 25px;
-    height: 25px;
-  }
-
-  .form-grid .full-row {
-    flex-direction: column;
+  .form-wrapper .btn-group {
     gap: 8px;
   }
 
-  .form-grid label:has(input[type="radio"]) {
-    min-height: 44px;
-    padding: 10px 16px;
+  .form-wrapper .btn-group .form-check-label {
+    padding: 12px 16px;
+    min-height: 48px;
+    font-size: 13px;
   }
 }
 
 @media (max-width: 576px) {
-  .driver-add-form {
-    padding: 10px;
+  .form-wrapper .btn-group {
+    gap: 6px;
   }
 
-  .form-sections-container {
-    padding: 15px;
+  .form-wrapper .btn-group .form-check-label {
+    padding: 12px 14px;
+    min-height: 44px;
+    font-size: 13px;
+  }
+}
+
+/* Read-only Fields */
+.form-wrapper input[readonly],
+.form-wrapper .read-only-input {
+  background: var(--gray-100) !important;
+  color: var(--gray-500) !important;
+  cursor: not-allowed !important;
+  border-color: var(--gray-300) !important;
+}
+
+.form-wrapper .read-only-select {
+  pointer-events: none;
+  opacity: 0.6;
+}
+
+/* Date Input with Icon */
+.form-wrapper .date-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.form-wrapper .date-input {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-400);
+  border-radius: 6px;
+  font-size: 14px;
+  background: var(--gray-100);
+  transition: border-color 0.2s ease;
+  color: var(--gray-700);
+}
+
+.form-wrapper .date-input:focus {
+  outline: none;
+  border-color: var(--primary-main);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-wrapper .date-icon {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: var(--gray-400);
+  pointer-events: none;
+}
+
+/* ClayDatePicker Input Group Styling */
+.form-wrapper .date-input-wrapper .clay-date-picker {
+  display: flex;
+  width: 100%;
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker .form-control {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: 0;
+  flex: 1;
+  border: 1px solid var(--gray-400);
+  padding: 10px 12px;
+  font-size: 14px;
+  background: white;
+  color: var(--gray-700);
+  min-height: 44px;
+  transition: all 0.2s ease;
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker .form-control:focus {
+  outline: none;
+  border-color: var(--primary-main);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker .form-control:hover {
+  border-color: var(--gray-500);
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker .input-group-append {
+  display: flex;
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker .input-group-append .btn {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 0;
+  background: white;
+  border-color: var(--gray-400);
+  color: var(--gray-600);
+  padding: 10px 12px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker .input-group-append .btn:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-500);
+  color: var(--gray-800);
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker .input-group-append .btn:focus {
+  outline: none;
+  border-color: var(--primary-main);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+/* Focus state for the entire ClayDatePicker input group */
+.form-wrapper .date-input-wrapper .clay-date-picker:focus-within .form-control {
+  border-color: var(--primary-main);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker:focus-within .btn {
+  border-color: var(--primary-main);
+}
+
+/* Alternative styling for ClayDatePicker as input group */
+.form-wrapper .date-input-wrapper .clay-date-picker-input-group {
+  display: flex;
+  width: 100%;
+  border: 1px solid var(--gray-400);
+  border-radius: 8px;
+  background: white;
+  transition: all 0.2s ease;
+  min-height: 44px;
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker-input-group:focus-within {
+  border-color: var(--primary-main);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker-input-group:hover {
+  border-color: var(--gray-500);
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker-input-group input {
+  border: none;
+  outline: none;
+  padding: 10px 12px;
+  flex: 1;
+  background: transparent;
+  font-size: 14px;
+  color: var(--gray-700);
+  min-height: 44px;
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker-input-group .input-group-append {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  background: transparent;
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker-input-group .input-group-append button {
+  border: none;
+  background: transparent;
+  color: var(--gray-600);
+  padding: 0;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color 0.2s ease;
+}
+
+.form-wrapper .date-input-wrapper .clay-date-picker-input-group .input-group-append button:hover {
+  color: var(--gray-800);
+}
+
+/* File Input */
+.form-wrapper input[type="file"] {
+  padding: 12px 16px !important;
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%) !important;
+  border: 2px dashed var(--gray-400) !important;
+  border-radius: 12px !important;
+  cursor: pointer;
+  transition: all 0.3s ease !important;
+  color: var(--gray-700);
+  font-size: 14px;
+  font-weight: 500;
+  position: relative;
+  min-height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z'/%3E%3Cpolyline points='14,2 14,8 20,8'/%3E%3Cline x1='16' y1='13' x2='8' y2='13'/%3E%3Cline x1='16' y1='17' x2='8' y2='17'/%3E%3Cpolyline points='10,9 9,9 8,9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: 16px center;
+  background-size: 20px 20px;
+  padding-left: 48px !important;
+}
+
+.form-wrapper input[type="file"]:hover {
+  border-color: var(--primary-main) !important;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.15) !important;
+}
+
+.form-wrapper input[type="file"]:focus {
+  border-color: var(--primary-main) !important;
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1), 0 4px 12px rgba(124, 58, 237, 0.15) !important;
+  outline: none;
+}
+
+.form-wrapper input[type="file"]::file-selector-button {
+  display: none;
+}
+
+/* Custom file input wrapper styling */
+.form-wrapper .file-input-wrapper {
+  position: relative;
+  display: block;
+  width: 100%;
+}
+
+.form-wrapper .file-input-wrapper::after {
+  content: '📎 Choose file or drag and drop';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  color: var(--gray-600);
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 1;
+  white-space: nowrap;
+}
+
+.form-wrapper .file-input-wrapper:hover::after {
+  color: var(--primary-main);
+  content: '📎 Click to browse files';
+}
+
+/* File input with file selected */
+.form-wrapper .file-input-wrapper.has-file::after {
+  content: '📎 File selected - Click to change';
+  color: var(--primary-main);
+  font-weight: 600;
+}
+
+/* Drag and drop states */
+.form-wrapper .file-input-wrapper.drag-over {
+  background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%) !important;
+  border-color: var(--primary-main) !important;
+}
+
+.form-wrapper .file-input-wrapper.drag-over::after {
+  content: '📎 Drop file here';
+  color: var(--primary-main);
+  font-weight: 600;
+}
+
+/* File size and type info */
+.form-wrapper .file-input-info {
+  margin-top: 8px;
+  font-size: 12px;
+  color: var(--gray-500);
+  text-align: center;
+}
+
+.form-wrapper .file-input-info.accepted-types {
+  color: var(--gray-600);
+}
+
+.form-wrapper .file-input-info.max-size {
+  color: var(--gray-500);
+}
+
+/* Form Errors */
+.form-wrapper .form-error {
+  color: var(--danger);
+  font-size: 12px;
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Make form errors span full width in grid */
+.form-wrapper .form-grid .form-error {
+  grid-column: 1 / -1;
+  margin-left: 0;
+}
+
+/* Error icon styling */
+.form-wrapper .error-icon {
+  color: var(--danger);
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 16px;
+  flex-shrink: 0;
+}
+
+.form-wrapper .has-error {
+  border-color: var(--danger) !important;
+}
+
+.form-wrapper .has-error:focus {
+  border-color: var(--danger) !important;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1) !important;
+}
+
+/* React Select Overrides */
+.form-wrapper .css-control {
+  border-radius: 8px !important;
+  border: 1px solid var(--gray-400) !important;
+  background: var(--gray-100) !important;
+  transition: all 0.2s ease !important;
+  min-height: 44px !important;
+  box-shadow: none !important;
+}
+
+.form-wrapper .css-control:hover {
+  border-color: var(--gray-500) !important;
+}
+
+.form-wrapper .css-control--is-focused {
+  border-color: var(--primary-main) !important;
+  background: white !important;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1) !important;
+}
+
+.form-wrapper .css-value-container {
+  padding: 6px 8px !important;
+}
+
+.form-wrapper .css-input {
+  font-size: 14px !important;
+}
+
+.form-wrapper .css-placeholder {
+  color: var(--gray-500) !important;
+}
+
+.form-wrapper .css-single-value {
+  color: var(--gray-700) !important;
+}
+
+.form-wrapper .css-indicator-separator {
+  background-color: var(--gray-300) !important;
+}
+
+.form-wrapper .css-dropdown-indicator {
+  color: var(--gray-500) !important;
+}
+
+.form-wrapper .css-clear-indicator {
+  color: var(--gray-500) !important;
+}
+
+/* Buttons */
+.form-wrapper .clay-btn {
+  border-radius: 6px !important;
+  font-weight: 500 !important;
+  transition: all 0.2s ease !important;
+  font-size: 14px !important;
+  padding: 10px 20px !important;
+}
+
+.form-wrapper .clay-btn-primary {
+  background: var(--primary-main) !important;
+  border-color: var(--primary-main) !important;
+  color: white !important;
+}
+
+.form-wrapper .clay-btn-primary:hover:not(:disabled) {
+  background: var(--primary-400) !important;
+  border-color: var(--primary-400) !important;
+}
+
+.form-wrapper .clay-btn-secondary {
+  background: white !important;
+  border-color: var(--gray-400) !important;
+  color: var(--gray-600) !important;
+}
+
+.form-wrapper .clay-btn-secondary:hover:not(:disabled) {
+  background: #f9fafb !important;
+  border-color: var(--gray-500) !important;
+}
+
+.form-wrapper .clay-btn:disabled {
+  opacity: 0.6 !important;
+  cursor: not-allowed !important;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .form-wrapper {
+    padding: 20px 10px;
   }
 
-  .section-title {
-    font-size: 16px;
-    padding-left: 30px;
+  .form-wrapper .form-header {
+    margin-bottom: 24px;
   }
 
-  .section-title::before {
-    width: 20px;
-    height: 20px;
-    font-size: 18px;
+  .form-wrapper .form-header h1 {
+    font-size: 24px;
   }
 
-  .submit-button {
+  .form-wrapper .step-content {
+    padding: 24px;
+  }
+
+  .form-wrapper .form-grid-3 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-wrapper .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-wrapper .form-wrapper-steps-action {
+    flex-direction: column-reverse;
+    gap: 8px;
+  }
+
+  .form-wrapper .form-wrapper-steps-action button {
     width: 100%;
-    padding: 12px 20px;
   }
 
-  .date-icon {
+  .form-wrapper .multi-step-nav {
+    padding: 20px;
+  }
+
+  .form-wrapper .multi-step-nav-container {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .form-wrapper .multi-step-nav-item {
+    flex-direction: row;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 12px;
+    border-radius: 8px;
+    background: #f9fafb;
+    border: 1px solid var(--gray-300);
+  }
+
+  /* RTL mobile support */
+  .form-wrapper [dir="rtl"] .multi-step-nav-item,
+  .form-wrapper .multi-step-nav[dir="rtl"] .multi-step-nav-item,
+  .form-wrapper .multi-step-nav.rtl .multi-step-nav-item {
+    text-align: right;
+    justify-content: flex-end;
+  }
+
+  .form-wrapper .multi-step-nav-item::before {
+    display: none;
+  }
+
+  .form-wrapper .multi-step-nav-divider {
+    display: none;
+  }
+
+  .form-wrapper .multi-step-nav-indicator {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+    margin-right: 12px;
+  }
+
+  .form-wrapper .multi-step-nav-title {
+    margin-top: 0;
     font-size: 14px;
   }
 }
 
-/* Accessibility Improvements */
+@media (max-width: 576px) {
+  .form-wrapper {
+    padding: 15px 8px;
+  }
+
+  .form-wrapper .form-header {
+    margin-bottom: 20px;
+  }
+
+  .form-wrapper .form-header h1 {
+    font-size: 20px;
+  }
+
+  .form-wrapper .form-header p {
+    font-size: 13px;
+  }
+
+  .form-wrapper .step-content {
+    padding: 16px;
+    min-height: auto;
+  }
+
+  .form-wrapper .form-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-wrapper .form-grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  .form-wrapper .multi-step-nav {
+    padding: 16px;
+  }
+
+  .form-wrapper .multi-step-nav-indicator {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .form-wrapper .multi-step-nav-title {
+    font-size: 13px;
+  }
+
+  /* Radio button responsive adjustments */
+  .form-wrapper .radio-button-group {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .form-wrapper .radio-button-group label:has(input[type="radio"]) {
+    flex: none;
+    min-width: auto;
+    width: 100%;
+  }
+}
+
+/* Accessibility */
 @media (prefers-reduced-motion: reduce) {
-  * {
+  .form-wrapper * {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
   }
 }
 
-/* Focus Visible for Keyboard Navigation */
-*:focus-visible {
-  outline: 3px solid #667eea;
+.form-wrapper *:focus-visible {
+  outline: 2px solid var(--primary-main);
   outline-offset: 2px;
 }
 
-/* Print Styles */
-@media print {
-  .section-nav,
-  .back-button-container,
-  .form-submit-container {
-    display: none;
-  }
+/* Disabled Button Styles */
+.form-wrapper .btn-main-primary-disabled {
+  background-color: var(--gray-400) !important;
+  color: var(--gray-500) !important;
+  cursor: not-allowed !important;
+  opacity: 0.6 !important;
+  border-color: var(--gray-400) !important;
+}
 
-  .form-section {
-    display: block !important;
-    page-break-inside: avoid;
-    box-shadow: none;
-    border: 1px solid #ddd;
-  }
+.form-wrapper .btn-main-primary-disabled:hover {
+  background-color: var(--gray-400) !important;
+  color: var(--gray-500) !important;
+  border-color: var(--gray-400) !important;
+}
+
+.form-wrapper .date-input-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.form-wrapper .input-group {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.form-wrapper .input-group-item {
+  margin-left: var(--spacer-2) !important;
+}
+
+.form-wrapper .input-group input {
+  flex: 1;
+  border: 1px solid var(--gray-400);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+  padding: 10px 12px;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  background: white;
+  color: var(--gray-700);
+  min-height: 44px;
+}
+
+.form-wrapper .input-group input:focus {
+  outline: none;
+  border-color: var(--primary-main);
+  background: white;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+
+.form-wrapper .input-group input:hover {
+  border-color: var(--gray-500);
+}
+
+.form-wrapper .input-group .input-group-item .input-group-inset-after.form-control {
+  border-bottom-right-radius: 0;
+  border-top-right-radius: 0;
+  border-right-width: 1;
+  padding-right: 5px;
+}
+
+/* Input Group Button Styling */
+.form-wrapper .input-group .input-group-item .btn {
+  border: none;
+  background: white;
+  color: var(--primary-main);
+  padding: 10px 12px;
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.form-wrapper .input-group .input-group-item .btn:hover {
+  background: var(--gray-50);
+  border-color: var(--gray-500);
+  color: var(--gray-800);
+}
+
+.form-wrapper .input-group .input-group-inset-item-after {
+  border: 1px solid var(--gray-400);
+  border-left: none;
+  border-radius: 0 8px 8px 0;
+  background: white;
+}
+
+.form-wrapper .input-group .input-group-item .btn:focus {
+  outline: none;
+  /*border-color: var(--primary-main);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+  */
+}
+
+/* Focus state for the entire input group */
+/*.form-wrapper .input-group:focus-within input {
+  border-color: var(--primary-main);
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.1);
+}
+*/
+
+.form-wrapper .input-group:focus-within .btn {
+  border-color: var(--primary-main);
+}
+
+/* ============================ */
+/* RTL mirrors for input groups */
+/* ============================ */
+.form-wrapper[dir="rtl"] .input-group input {
+  border-right: 1px solid var(--gray-400) !important;
+  border-left: 0px solid var(--gray-400) !important;
+  border-radius: 0 8px 8px 0 !important;
+}
+
+.form-wrapper[dir="rtl"] .input-group .input-group-inset-item-after {
+  border-left: 1px solid var(--gray-400);
+  border-right: none;
+  border-radius: 8px 0 0 8px;
+}
+
+.form-wrapper[dir="rtl"] .input-group-item {
+  margin-left: 0 !important;
+  margin-right: var(--spacer-2) !important;
+}
+
+/* RTL mirrors for ClayDatePicker composed as input group */
+.form-wrapper[dir="rtl"] .date-input-wrapper .clay-date-picker .form-control {
+  border-left: 0;
+  border-right: 1px solid var(--gray-400);
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-top-right-radius: 8px;
+  border-bottom-right-radius: 8px;
+}
+
+.form-wrapper[dir="rtl"] .date-input-wrapper .clay-date-picker .input-group-append .btn {
+  border-right: 0;
+  border-left: 1px solid var(--gray-400);
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-top-left-radius: 8px;
+  border-bottom-left-radius: 8px;
+}
+
+.file-test{
+  bottom: 5px !important;
+  min-height: 20px;
+}
+.address-test{
+  bottom: 10px !important;
+  min-height: 20px;
 }

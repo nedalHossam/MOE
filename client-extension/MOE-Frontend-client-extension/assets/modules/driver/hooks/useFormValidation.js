@@ -1,210 +1,324 @@
 import { useState, useCallback } from "react";
 import moment from "moment";
+import * as Yup from "yup";
 
 export const useFormValidation = () => {
     const [errors, setErrors] = useState({});
     const [formTouched, setFormTouched] = useState({});
 
-    const validateField = useCallback((field, value, formData = {}) => {
-        let fieldError = "";
+    const validateField = (field, value, context = {}) => {
+        // Build Yup schema for the single field
+        const schemas = {
+            fullName: Yup.string()
+                .required("This field is required.")
+                .min(2, "Enter a valid name.")
+                .max(100, "Enter a valid name."),
 
-        switch (field) {
-            case "fullName":
-                // For localized fields, validate that at least one locale has a value
-                const fullNameTranslations = formData.fullName_i18n || {};
-                const hasAnyValue = Object.values(fullNameTranslations).some((value) => value && value.trim().length > 0);
-
-                if (!hasAnyValue) {
-                    fieldError = "This field is required.";
-                } else {
-                    // Check the current locale's value for length validation
-                    const currentFullName = fullNameTranslations[formData.localizedInputLocales?.fullName] || "";
-                    if (currentFullName && (currentFullName.trim().length < 2 || currentFullName.trim().length > 100)) {
-                        fieldError = "Enter a valid name.";
-                    }
-                }
-                break;
-
-            case "dateOfBirth":
-                if (!value || value.trim().length === 0) {
-                    fieldError = "This field is required.";
-                } else {
-                    const dob = moment(value, "YYYY-MM-DD", true);
+            dateOfBirth: Yup.string()
+                .required("This field is required.")
+                .test("valid-dob", "Date must be in the past and >=18 years", (val) => {
+                    if (!val) return false;
+                    const dob = moment(val, "YYYY-MM-DD", true);
                     const today = moment();
                     const age = today.diff(dob, "years");
+                    return dob.isValid() && dob.isBefore(today) && age >= 18;
+                }),
+            nationality: Yup.string().required("This field is required."),
+            department: Yup.string().required("This field is required."),
+            residencyOrIDNumber: Yup.string().required("This field is required."),
+            employerType: Yup.string().required("This field is required."),
+            employeeMOEID: Yup.string().when("employerType", {
+                is: "MOE",
+                then: Yup.string().required("This field is required."),
+                otherwise: Yup.string().nullable(),
+            }),
+            primaryVehicleId: Yup.string().when("employerType", {
+                is: "Vehicle Owner",
+                then: Yup.string().required("This field is required."),
+                otherwise: Yup.string().nullable(),
+            }),
 
-                    if (!dob.isValid() || dob.isAfter(today)) {
-                        fieldError = "The Date of Birth Must be a past date and must be >=18 years";
-                    } else if (age < 18) {
-                        fieldError = "The Date of Birth Must be a past date and must be >=18 years";
+
+            phoneNumber: Yup.string()
+                .required("This field is required.")
+                .matches(/^(\+968)?[79]\d{7}$/, "Please enter a valid Oman phone number."),
+            email: Yup.string().required("This field is required.").email("Enter a valid email."),
+            address: Yup.string().required("This field is required.").max(200, "Max 200 characters."),
+
+
+            address_i18n: Yup.object()
+                .test("at-least-one", "This field is required.", (value) =>
+                    value && Object.values(value).some((v) => v?.trim())
+                )
+                .test("length-check", t("Address too long. Free text up to 200 chars"), (value, context) => {
+                    const currentLocale =
+                        formData.currentLocale || Object.keys(value || {})[0];
+                    const currentValue = value?.[currentLocale] || "";
+                    return currentValue.length <= 200;
+                }),
+
+            emergencyContactAddress_i18n: Yup.object()
+                .test("at-least-one", "This field is required.", (value) =>
+                    value && Object.values(value).some((v) => v?.trim())
+                )
+                .test("length-check", "Address too long. Free text up to 200 chars", (value, context) => {
+                    const currentLocale =
+                        formData.currentLocale || Object.keys(value || {})[0];
+                    const currentValue = value?.[currentLocale] || "";
+                    return currentValue.length <= 200;
+                }),
+
+            emergencyContactPhone: Yup.string()
+                .required("This field is required.")
+                .matches(
+                    /^(\+968)?[79]\d{7}$/,
+                    t("Please enter a valid Oman phone number (e.g., +96891234567 or 91234567).")
+                ),
+
+            emergencyContactEmail: Yup.string()
+                .required("This field is required.")
+                .email(t("Enter a valid email.")),
+
+            // emergencyContactAddress_i18n: Yup.string()
+            //     .required(t("This field is required."))
+            //     .max(200, t("Address too long. Free text up to 200 chars")),
+            licenseNumber: Yup.string().required("This field is required."),
+            licenseClass: Yup.string().required("This field is required."),
+            licenseExpiry: Yup.string()
+                .required("This field is required.")
+                .test("future-date", "License expiry must be in the future.", (val) => {
+                    if (!val) return false;
+                    return moment(val, "YYYY-MM-DD", true).isValid() && moment(val).isAfter(moment(), "day");
+                }),
+        };
+
+        if (!schemas[field]) return true; // ignore unknown fields
+
+        try {
+            schemas[field].validateSync(value, { context });
+            setErrors((prev) => ({ ...prev, [field]: undefined }));
+            return true;
+        } catch (err) {
+            setErrors((prev) => ({ ...prev, [field]: err.message }));
+            return false;
+        }
+    };
+
+
+    const validateBasicInfo = async (formData, t) => {
+        const errs = {};
+
+        const schema = Yup.object().shape({
+            fullName: Yup.string()
+                .required("This field is required.")
+                .min(2, "Enter a valid name.")
+                .max(100, "Enter a valid name."),
+
+            // fullName: Yup.object()
+            //     .test("at-least-one", t("This field is required."), (value) =>
+            //         value && Object.values(value).some(v => v?.trim())
+            //     )
+            //     .test("length-check", t("Enter a valid name."), (value, context) => {
+            //         const currentLocale =
+            //             formData.currentLocale || Object.keys(value || {})[0];
+            //         const nameValue = value?.[currentLocale]?.trim() || "";
+            //         return !nameValue || (nameValue.length >= 2 && nameValue.length <= 100);
+            //     }),
+            dateOfBirth: Yup.string()
+                .required(t("This field is required."))
+                .test(
+                    "valid-dob",
+                    t("The Date of Birth must be a past date and must be ≥18 years."),
+                    (value) => {
+                        if (!value) return false;
+                        const dob = moment(value, "YYYY-MM-DD", true);
+                        const today = moment();
+                        const age = today.diff(dob, "years");
+                        return dob.isValid() && dob.isBefore(today) && age >= 18;
                     }
-                }
-                break;
+                ),
+            nationality: Yup.string().required(t("This field is required.")),
+            department: Yup.string().required(t("This field is required.")),
+            residencyOrIDNumber: Yup.string().required(t("This field is required.")),
+            employerType: Yup.string().required(t("This field is required.")),
+            employeeMOEID: Yup.string().when("employerType", {
+                is: "MOE",
+                then: (schema) => schema.required(t("This field is required.")),
+            }),
+            primaryVehicleId: Yup.string().when("employerType", {
+                is: "Vehicle Owner",
+                then: (schema) => schema.required(t("This field is required.")),
+            }),
+        });
 
-            case "nationality":
-                if (!value) {
-                    fieldError = "This field is required.";
-                }
-                break;
+        try {
+            await schema.validate(formData, { abortEarly: false });
+        } catch (err) {
+            err.inner.forEach((e) => {
+                errs[e.path] = e.message;
+            });
+        }
 
-            case "residencyOrIDNumber":
-                if (!value || value.trim().length === 0) {
-                    fieldError = "This field is required.";
-                }
-                break;
+        return errs;
+    };
 
-            case "employerType":
-                if (!value) {
-                    fieldError = "This field is required.";
-                }
-                break;
+    const validateContactInfo = async (formData, t) => {
+        const errs = {};
 
-            case "employeeMOEID":
-                if (formData.employerType === "MOE") {
-                    if (!value || value.trim().length === 0) {
-                        fieldError = "This field is required.";
+        const schema = Yup.object().shape({
+            phoneNumber: Yup.string()
+                .required(t("This field is required."))
+                .matches(
+                    /^(\+968)?[79]\d{7}$/,
+                    t("Please enter a valid Oman phone number (e.g., +96891234567 or 91234567).")
+                ),
+
+            email: Yup.string()
+                .required(t("This field is required."))
+                .email(t("Enter a valid email.")),
+
+
+            address_i18n: Yup.object()
+                .test("at-least-one", t("This field is required."), (value) =>
+                    value && Object.values(value).some((v) => v?.trim())
+                )
+                .test("length-check", t("Address too long. Free text up to 200 chars"), (value, context) => {
+                    const currentLocale =
+                        formData.currentLocale || Object.keys(value || {})[0];
+                    const currentValue = value?.[currentLocale] || "";
+                    return currentValue.length <= 200;
+                }),
+
+            emergencyContactAddress_i18n: Yup.object()
+                .test("at-least-one", t("This field is required."), (value) =>
+                    value && Object.values(value).some((v) => v?.trim())
+                )
+                .test("length-check", t("Address too long. Free text up to 200 chars"), (value, context) => {
+                    const currentLocale =
+                        formData.currentLocale || Object.keys(value || {})[0];
+                    const currentValue = value?.[currentLocale] || "";
+                    return currentValue.length <= 200;
+                }),
+
+
+            emergencyContactPhone: Yup.string()
+                .required(t("This field is required."))
+                .matches(
+                    /^(\+968)?[79]\d{7}$/,
+                    t("Please enter a valid Oman phone number (e.g., +96891234567 or 91234567).")
+                ),
+
+            emergencyContactEmail: Yup.string()
+                .required(t("This field is required."))
+                .email(t("Enter a valid email.")),
+
+            // emergencyContactAddress_i18n: Yup.string()
+            //     .required(t("This field is required."))
+            //     .max(200, t("Address too long. Free text up to 200 chars")),
+        });
+
+        try {
+            await schema.validate(formData, { abortEarly: false });
+        } catch (err) {
+            err.inner.forEach((e) => {
+                errs[e.path] = e.message;
+            });
+        }
+
+        return errs;
+    };
+
+    const validateLicenseInfo = async (formData, t) => {
+        const errs = {};
+
+        const schema = Yup.object().shape({
+            licenseNumber: Yup.string().required(t("This field is required.")),
+
+            licenseClass: Yup.string().required(t("This field is required.")),
+
+            licenseExpiry: Yup.string()
+                .required(t("This field is required."))
+                .test(
+                    "future-date",
+                    t("License expiry must be in the future."),
+                    (value) => {
+                        if (!value) return false;
+                        return (
+                            moment(value, "YYYY-MM-DD", true).isValid() &&
+                            moment(value).isAfter(moment(), "day")
+                        );
                     }
+                ),
+        });
+
+        try {
+            await schema.validate(formData, { abortEarly: false });
+        } catch (err) {
+            err.inner.forEach((e) => {
+                errs[e.path] = e.message;
+            });
+        }
+
+        return errs;
+    };
+
+    const validateOperationalInfo = async (formData, t) => {
+        const errs = {};
+
+        const schema = Yup.object().shape({
+            attachmentDescription_i18n: Yup.object().test(
+                "attachment-desc-check",
+                t("Enter a description up to 200 chars."),
+                function (value) {
+                    const attachmentFile = this.parent?.attachmentFile;
+                    if (!attachmentFile) return true; // ignore if no file
+                    const hasAny =
+                        value && Object.values(value).some((v) => v?.trim());
+                    if (!hasAny) return false;
+
+                    const currentLocale =
+                        formData.currentLocale ||
+                        Object.keys(value || {})[0];
+                    const currentValue = value?.[currentLocale] || "";
+                    return currentValue.length <= 200;
                 }
-                break;
+            ),
+        });
 
-            case "primaryVehicleId":
-                if (formData.employerType === "Vehicle Owner") {
-                    if (!value || value.trim().length === 0) {
-                        fieldError = "This field is required.";
-                    }
-                }
-                break;
-
-            case "phoneNumber":
-                if (!value || value.trim().length === 0) {
-                    fieldError = "This field is required.";
-                } else if (!/^(\+968)?[79]\d{7}$/.test(value.replace(/\s/g, ""))) {
-                    fieldError = "Please enter a valid Oman phone number (e.g., +96891234567 or 91234567).";
-                }
-                break;
-
-            case "email":
-                if (!value || value.trim().length === 0) {
-                    fieldError = "This field is required.";
-                } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-                    fieldError = "Enter a valid email.";
-                }
-                break;
-
-            case "licenseNumber":
-                if (!value || value.trim().length === 0) {
-                    fieldError = "This field is required.";
-                }
-                break;
-
-            case "licenseClass":
-                if (!value) {
-                    fieldError = "This field is required.";
-                }
-                break;
-
-            case "licenseExpiry":
-                if (!value || value.trim().length === 0) {
-                    fieldError = "This field is required.";
-                } else if (!moment(value, "YYYY-MM-DD", true).isValid() || moment(value).isBefore(moment(), "day")) {
-                    fieldError = "License expiry must be in the future.";
-                }
-                break;
-
-            case "attachmentDescription":
-                if (formData.attachmentFile) {
-                    const attachmentDescTranslations = formData.attachmentDescription_i18n || {};
-                    const hasAnyValue = Object.values(attachmentDescTranslations).some((value) => value && value.trim().length > 0);
-
-                    if (!hasAnyValue) {
-                        fieldError = "Enter a description up to 200 chars.";
-                    } else {
-                        const currentAttachmentDesc = attachmentDescTranslations[formData.localizedInputLocales?.attachmentDescription] || "";
-                        if (currentAttachmentDesc && currentAttachmentDesc.length > 200) {
-                            fieldError = "Enter a description up to 200 chars.";
-                        }
-                    }
-                }
-                break;
-
-            default:
-                break;
+        try {
+            await schema.validate(formData, { abortEarly: false });
+        } catch (err) {
+            err.inner.forEach((e) => {
+                errs[e.path] = e.message;
+            });
         }
 
-        setErrors((prev) => ({
-            ...prev,
-            [field]: fieldError,
-        }));
-
-        return fieldError;
-    }, []);
-
-    const validateAllSections = useCallback((formData) => {
-        const allErrors = {};
-
-        // Basic Info validation
-        if (!formData.fullName_i18n || Object.values(formData.fullName_i18n).every((v) => !v || v.trim() === "")) {
-            allErrors.fullName = "This field is required.";
-        }
-
-        if (!formData.dateOfBirth) {
-            allErrors.dateOfBirth = "This field is required.";
-        }
-
-        if (!formData.nationality) {
-            allErrors.nationality = "This field is required.";
-        }
-
-        if (!formData.residencyOrIDNumber) {
-            allErrors.residencyOrIDNumber = "This field is required.";
-        }
-
-        if (!formData.employerType) {
-            allErrors.employerType = "This field is required.";
-        }
-
-        if (formData.employerType === "MOE" && !formData.employeeMOEID) {
-            allErrors.employeeMOEID = "This field is required.";
-        }
-
-        if (formData.employerType === "Vehicle Owner" && !formData.primaryVehicleId) {
-            allErrors.primaryVehicleId = "This field is required.";
-        }
-
-        // Contact Info validation
-        if (!formData.phoneNumber) {
-            allErrors.phoneNumber = "This field is required.";
-        }
-
-        if (!formData.email) {
-            allErrors.email = "This field is required.";
-        }
-
-        // License validation
-        if (!formData.licenseNumber) {
-            allErrors.licenseNumber = "This field is required.";
-        }
-
-        if (!formData.licenseClass) {
-            allErrors.licenseClass = "This field is required.";
-        }
-
-        if (!formData.licenseExpiry) {
-            allErrors.licenseExpiry = "This field is required.";
-        }
-
-        setErrors(allErrors);
-        return Object.keys(allErrors).length === 0;
-    }, []);
-
+        return errs;
+    };
+    const validateAllSections = (t) => {
+        const allErrors = {
+            ...validateBasicInfo(t),
+            ...validateContactInfo(t),
+            ...validateLicenseInfo(t),
+            ...validateOperationalInfo(t),
+        };
+        return allErrors;
+    };
     const setFieldTouched = useCallback((field) => {
+        //make fields true if touched
+        /**
+             * So if the form had:
+            { fullName: false, email: false }
+            and the user types in fullName, it becomes:
+            { fullName: true, email: false }
+             */
         setFormTouched((prev) => ({ ...prev, [field]: true }));
     }, []);
-
+    console.log("form touced", formTouched)
     const clearErrors = useCallback(() => {
         setErrors({});
     }, []);
-
+    // Resets the “touched” status of all fields:
     const clearFormTouched = useCallback(() => {
         setFormTouched({});
     }, []);
@@ -213,6 +327,10 @@ export const useFormValidation = () => {
         errors,
         formTouched,
         validateField,
+        validateBasicInfo,
+        validateContactInfo,
+        validateLicenseInfo,
+        validateOperationalInfo,
         validateAllSections,
         setFieldTouched,
         clearErrors,

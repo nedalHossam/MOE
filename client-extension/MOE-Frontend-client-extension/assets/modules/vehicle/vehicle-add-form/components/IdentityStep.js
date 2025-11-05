@@ -53,8 +53,8 @@ const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoadin
         }
     };
 
-    // Status should be readonly in edit mode
-    const isStatusReadonly = isEditMode;
+    // Status should be readonly in create mode and edit
+    const isStatusReadonly = true;
     
     // Check if status is draft (for filtering options)
     const isDraftStatus = String(formData.vehicleStatus || "").toLowerCase() === "draft";
@@ -79,7 +79,7 @@ const IdentityStep = ({ formData, errors, picklistData, optionsLoading, isLoadin
                         {t("status")} <span className="required-asterisk">*</span>
                     </label>
                     <SelectComponent
-                        options={statusOptions}
+                        options={picklistData.status}
                         value={formData.vehicleStatus}
                         onChange={(value) => handleSelectChangeWithI18n("vehicleStatus", value)}
                         isLoading={optionsLoading}

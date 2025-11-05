@@ -31,3 +31,13 @@ vehicle-add-form-reactjs:
     urls:
         - index.*.js
     useESM: true
+vehicle-list-reactjs:
+    friendlyURLMapping: vehicle-list-reactjs
+    htmlElementName: vehicle-list-reactjs
+    instanceable: false
+    name: Vehicle List Reactjs
+    portletCategoryName: category.client-extensions
+    type: customElement
+    urls:
+        - index.*.js
+    useESM: true

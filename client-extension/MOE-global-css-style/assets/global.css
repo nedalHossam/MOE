@@ -579,6 +579,38 @@ margin-bottom: 0.5rem;
     vertical-align: middle;
 }
 
+/* Hide column visibility cell in table */
+.table-wrapper .table-column-visibility,
+.table-wrapper .column-visibility,
+.table-wrapper [data-table-column-visibility],
+.table-header-cell[data-table-column-visibility],
+.table-container .table-column-visibility,
+.table-container .column-visibility,
+.table-header .table-column-visibility,
+.table-header .column-visibility,
+/* Hide any header cell that might be for column visibility controls */
+.clay-table thead tr th:last-child[aria-label*="visibility"],
+.clay-table thead tr th:last-child[aria-label*="column"],
+.clay-table .table-head .table-column-visibility,
+.clay-table .table-head .column-visibility,
+/* Hide column visibility in ClayUI Core Table component */
+.clay-table .table-column-visibility,
+[class*="table-column-visibility"],
+[class*="column-visibility"],
+/* Hide any cell/header that contains column visibility controls */
+.table-header-cell:has(button[aria-label*="column"]),
+.table-header-cell:has(button[aria-label*="visibility"]),
+.table-header-cell:has(.dropdown[aria-label*="column"]),
+.table-header-cell:has(.dropdown[aria-label*="visibility"]) {
+    display: none !important;
+    visibility: hidden !important;
+    width: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    overflow: hidden !important;
+}
+
 /* Fix for sort icons not showing */
 .component-action svg {
     width: 16px;
@@ -2610,5 +2642,118 @@ display:none !important;
   .success-popup-message {
     font-size: 16px;
   }
+}
+
+/* Search Input Component Styles */
+.search-input-wrapper {
+  width: 100%;
+}
+
+.search-input-container {
+  position: relative;
+  display: flex;
+  align-items: center;
+    background: #F2F2F7;
+    font-size: 15px;
+    outline: none;
+    font-family: 'Poppins', sans-serif;
+    border: none;
+    border-radius: 8px;
+    color: #9EA2AD;
+}
+
+.search-input-container:focus-within {
+  background-color: var(--white);
+  border-color: var(--primary-main);
+  box-shadow: 0 0 0 3px rgba(122, 65, 247, 0.1);
+}
+
+.search-icon {
+    position: absolute;
+    left: 12px;
+    color: #9EA2AD;
+    font-size: 18px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 40px 10px 40px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--gray-900);
+  outline: none;
+  font-family: 'Poppins', sans-serif;
+}
+
+.search-input::placeholder {
+  color: var(--gray-500);
+  font-style: normal;
+}
+
+.search-input:focus {
+  outline: none;
+}
+
+/* Clear Button Styles */
+.search-clear-btn {
+  position: absolute;
+  right: 12px;
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  transition: opacity 0.2s ease;
+}
+
+.search-clear-btn:hover {
+  opacity: 0.7;
+}
+
+.search-clear-btn:focus {
+  outline: 2px solid var(--primary-main);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+.search-clear-icon {
+  color: var(--gray-600);
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.search-clear-btn:hover .search-clear-icon {
+  color: var(--gray-900);
+}
+
+/* Adjust input padding when clear button is visible */
+.search-input-container.has-clear-btn .search-input {
+  padding-right: 40px;
+}
+
+/* RTL Support */
+[dir="rtl"] .search-icon {
+  left: auto;
+  right: 12px;
+}
+
+[dir="rtl"] .search-input {
+  padding: 10px 40px 10px 16px;
+}
+
+[dir="rtl"] .search-clear-btn {
+  right: auto;
+  left: 12px;
+}
+
+[dir="rtl"] .search-input-container.has-clear-btn .search-input {
+  padding-left: 40px;
+  padding-right: 16px;
 }
 

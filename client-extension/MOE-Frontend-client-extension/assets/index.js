@@ -27,6 +27,7 @@ import {
   Pagination,
   RadioButton,
   RichTextEditor,
+  SearchInput,
   Steps,
   SuccessPopup,
   Table,
@@ -37,6 +38,7 @@ import {
 // Import form modules
 import './modules/driver/driver-add-form/index.js'
 import './modules/vehicle/vehicle-add-form/index.js'
+import './modules/vehicle/vehicle-list/index.js'
 
 // UI Components Demo
 const UIComponentsDemo = () => {
@@ -55,6 +57,47 @@ const UIComponentsDemo = () => {
   const [radioValue, setRadioValue] = React.useState('');
   const [tablePage, setTablePage] = React.useState(1);
   const [tablePageSize, setTablePageSize] = React.useState(10);
+  const [searchValue, setSearchValue] = React.useState('');
+  const [tableSort, setTableSort] = React.useState(null);
+
+  // Initialize state from URL parameters on mount
+  React.useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    
+    // Initialize search value from URL
+    const searchParam = urlParams.get('search');
+    if (searchParam) {
+      setSearchValue(searchParam);
+    }
+    
+    // Initialize page from URL
+    const pageParam = urlParams.get('page');
+    if (pageParam) {
+      const page = parseInt(pageParam, 10);
+      if (!isNaN(page) && page > 0) {
+        setTablePage(page);
+      }
+    }
+    
+    // Initialize page size from URL
+    const pageSizeParam = urlParams.get('pageSize');
+    if (pageSizeParam) {
+      const pageSize = parseInt(pageSizeParam, 10);
+      if (!isNaN(pageSize) && pageSize > 0) {
+        setTablePageSize(pageSize);
+      }
+    }
+    
+    // Initialize sort from URL
+    const sortByParam = urlParams.get('sortBy');
+    const sortOrderParam = urlParams.get('sortOrder');
+    if (sortByParam) {
+      setTableSort({
+        column: sortByParam,
+        direction: sortOrderParam || 'ascending'
+      });
+    }
+  }, []); // Run only on mount
 
   const locales = [
     { label: 'en-US', symbol: 'en-us' },
@@ -321,6 +364,12 @@ const UIComponentsDemo = () => {
     setTablePage(1); // Reset to first page when changing page size
   };
 
+  const handleTableSortChange = (sort) => {
+    console.log('Table sort changed:', sort);
+    setTableSort(sort);
+    setTablePage(1); // Reset to first page when sorting changes
+  };
+
   const handleRowAction = (action, row) => {
     console.log(`${action} clicked for vehicle:`, row);
     // You can add your custom logic here for handling row actions
@@ -334,6 +383,23 @@ const UIComponentsDemo = () => {
       }
     }
   };
+
+  // Filter vehicles based on search value
+  const filteredVehicleData = React.useMemo(() => {
+    if (!searchValue.trim()) {
+      return vehicleData;
+    }
+    const searchLower = searchValue.toLowerCase();
+    return vehicleData.filter(vehicle => 
+      vehicle.vehicleId?.toLowerCase().includes(searchLower) ||
+      vehicle.plateNumber?.toLowerCase().includes(searchLower) ||
+      vehicle.brandModel?.toLowerCase().includes(searchLower) ||
+      vehicle.location?.toLowerCase().includes(searchLower) ||
+      vehicle.category?.toLowerCase().includes(searchLower) ||
+      vehicle.status?.toLowerCase().includes(searchLower)
+    );
+  }, [searchValue]);
+
 
   return (
     <Provider spritemap={spritemap}>
@@ -557,14 +623,28 @@ const UIComponentsDemo = () => {
         {/* Vehicle Management Table */}
         <section style={{ marginBottom: '30px' }}>
           <h2>Vehicle Management Table</h2>
+
+              <SearchInput
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+                onSearch={(value) => {
+                  setSearchValue(value);
+                  setTablePage(1);
+                }}
+                placeholder="ابحث هنا"
+                spritemap={spritemap}
+              />
+
           <Table
-            items={vehicleData}
+            items={filteredVehicleData}
             columns={vehicleColumns}
             page={tablePage}
             pageSize={tablePageSize}
             onPageChange={handleTablePageChange}
             onPageSizeChange={handleTablePageSizeChange}
-            totalItems={vehicleData.length}
+            onSortChange={handleTableSortChange}
+            sort={tableSort}
+            totalItems={filteredVehicleData.length}
             onRowAction={handleRowAction}
             showActions={true}
             actions={[
