@@ -10,6 +10,7 @@ import { Table, SearchInput, Button } from "../../../components/ui";
 import ClayIcon from "@clayui/icon";
 import { getVehicleList } from "../hooks/api";
 import FilterForm from "./components/filter-form";
+import { getVehicleColumns } from "./components/data-columns";
 
 const VehicleList = () => {
     const { t, currentLanguage, direction } = useTranslation();
@@ -30,6 +31,7 @@ const VehicleList = () => {
     const spritemap = `${Liferay.ThemeDisplay.getPathThemeImages()}/clay/icons.svg`;
     const isInitializedRef = useRef(false);
     const lastPageRef = useRef(1); // Track the last page to prevent unwanted resets
+    const isChangingPageSizeRef = useRef(false); // Track if we're in the middle of a pageSize change
 
     // Initialize state from URL parameters on mount and set defaults if missing
     useEffect(() => {
@@ -98,28 +100,7 @@ const VehicleList = () => {
         isInitializedRef.current = true;
     }, []);
 
-    // Monitor tablePage changes to debug resets
-    useEffect(() => {
-        if (isInitializedRef.current) {
-            const previousPage = lastPageRef.current;
-            console.log(`tablePage changed to: ${tablePage}, previous: ${previousPage}`);
-            // Warn if page resets unexpectedly (from a non-1 value back to 1, or any other unexpected change)
-            if (previousPage > 1 && tablePage === 1 && previousPage !== tablePage) {
-                console.warn(`⚠️ tablePage unexpectedly reset from ${previousPage} to 1! Check stack trace above.`);
-                console.trace('Stack trace for unexpected reset:');
-            }
-            // Update ref after logging - but only if the change is valid
-            // If we're resetting to 1 from a higher page, check if it was intentional
-            if (previousPage > 1 && tablePage === 1) {
-                // This might be intentional (search, sort, pageSize change), so we'll allow it
-                // but log it for debugging
-                console.log(`Page reset to 1 from ${previousPage} - this may be intentional (search/sort/pageSize change)`);
-            }
-            lastPageRef.current = tablePage;
-        }
-    }, [tablePage]);
 
-    // Sync from URL changes (browser back/forward)
     // Use a ref to track tablePage to avoid stale closures
     const tablePageRef = useRef(tablePage);
     useEffect(() => {
@@ -215,28 +196,52 @@ const VehicleList = () => {
         const fetchVehicles = async () => {
             try {
                 setLoading(true);
-                // Use current page and pageSize values (defaults to 1 and 2 if not set)
-                // Capture current values to avoid stale closures
-                const currentPage = tablePage || 1;
+                
+                // CRITICAL FIX: Use lastPageRef for the most up-to-date page value
+                const currentPage = lastPageRef.current;
                 const currentPageSize = tablePageSize || 2;
                 const currentSearch = searchValue || '';
                 const sortParam = getSortParam(tableSort);
-                console.log(`Fetching vehicles with page=${currentPage}, pageSize=${currentPageSize}, search=${currentSearch}, sort=${sortParam}, filters=`, filters);
+                
+                console.log(`🔄 Fetching: page=${currentPage}, pageSize=${currentPageSize}, isChangingPageSize=${isChangingPageSizeRef.current}`);
+                
                 const response = await getVehicleList(currentPage, currentPageSize, currentSearch, sortParam, filters);
+                
+                // Extract pagination data from response (handle both response.pagination and top-level properties)
+                const responseLastPage = response?.pagination?.lastPage || response?.lastPage || 1;
+                const responseTotalCount = response?.pagination?.totalCount || response?.totalCount || 0;
+                
+                console.log(`vehicle listttttttt`, response, currentPage, currentPageSize);
+                
                 setVehicles(response.items || []);
-                // Always use the requested page, not what the API returns (to prevent resets)
+                
+                // Always use the REQUESTED page and pageSize, not what the API returns
                 setPagination({
                     page: currentPage,
                     pageSize: currentPageSize,
-                    lastPage: response.pagination?.lastPage || 1,
-                    totalCount: response.pagination?.totalCount || 0
+                    lastPage: responseLastPage,
+                    totalCount: responseTotalCount
                 });
                 
-                // Verify state is still correct after fetch (debugging)
-                console.log(`After fetch: tablePage should be ${currentPage}`);
+                // CRITICAL FIX: Only validate if NOT changing page size
+                if (!isChangingPageSizeRef.current && currentPage > responseLastPage && responseLastPage > 0) {
+                    console.log(`⚠️ Page ${currentPage} exceeds lastPage ${responseLastPage}, resetting to ${responseLastPage}`);
+                    lastPageRef.current = responseLastPage;
+                    setTablePage(responseLastPage);
+                    
+                    const urlParams = new URLSearchParams(window.location.search);
+                    urlParams.set('page', responseLastPage);
+                    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`);
+                }
+                
+                // Reset the flag after fetch completes
+                isChangingPageSizeRef.current = false;
+
             } catch (error) {
                 console.error("Error fetching vehicles:", error);
                 toast.error(t("failedToFetchVehicles") || "Failed to fetch vehicles");
+                // Reset flag even on error
+                isChangingPageSizeRef.current = false;
             } finally {
                 setLoading(false);
             }
@@ -345,66 +350,14 @@ const VehicleList = () => {
          return mappedVehicles;
     }, [mappedVehicles]);
 
-    // Table columns configuration (Arabic labels)
-    const vehicleColumns = [
-        {
-            key: 'vehicleNumber',
-            label: currentLanguage === 'ar-SA' ? 'رقم الركية' : 'Vehicle Number',
-            sortable: true
-        },
-        {
-            key: 'plateNumber',
-            label: currentLanguage === 'ar-SA' ? 'رقم اللوحة' : 'Plate Number',
-            sortable: true
-        },
-        {
-            key: 'brandModel',
-            label: currentLanguage === 'ar-SA' ? 'الماركة / الطراز' : 'Make / Model',
-            sortable: true
-        },
-        {
-            key: 'year',
-            label: currentLanguage === 'ar-SA' ? 'السنة' : 'Year',
-            sortable: true
-        },
-        {
-            key: 'category',
-            label: currentLanguage === 'ar-SA' ? 'الفئة' : 'Category',
-            sortable: true
-        },
-        {
-            key: 'seats',
-            label: currentLanguage === 'ar-SA' ? 'عدد المقاعد' : 'Number of Seats'
-        },
-        {
-            key: 'registrationNumber',
-            label: currentLanguage === 'ar-SA' ? 'رقم التسجيل' : 'Registration Number',
-            sortable: true
-        },
-        {
-            key: 'insuranceExpiryDate',
-            label: currentLanguage === 'ar-SA' ? 'تاريخ إنتهاء التأمين' : 'Insurance Expiry Date',
-            sortable: true
-        },
-        {
-            key: 'kilometers',
-            label: currentLanguage === 'ar-SA' ? 'الكيلومترات' : 'Kilometers'
-        },
-        {
-            key: 'location',
-            label: currentLanguage === 'ar-SA' ? 'موقع المركبة' : 'Vehicle Location',
-            sortable: true
-        },
-        {
-            key: 'status',
-            label: currentLanguage === 'ar-SA' ? 'الحالة' : 'Status',
-            sortable: true
-        }
-    ];
+    // Table columns configuration
+    const vehicleColumns = useMemo(() => {
+        return getVehicleColumns(currentLanguage);
+    }, [currentLanguage]);
 
     // Table event handlers
     const handleTablePageChange = (page) => {
-        console.log(`handleTablePageChange called with page=${page}, current tablePage=${tablePage}, lastPageRef=${lastPageRef.current}`);
+        console.log(`📄 Page change requested: ${page} (current: ${tablePage})`);
         
         // Prevent setting to the same page
         if (page === tablePage) {
@@ -415,20 +368,32 @@ const VehicleList = () => {
         // Update ref to track intended page BEFORE state update
         lastPageRef.current = page;
         
-        // Update state - Pagination component already handles URL update
+        // Update state
         setTablePage(page);
-        
-        console.log(`After handleTablePageChange: setTablePage(${page}) called`);
+        console.log(`📄 Page change requested: ${page} (current: ${tablePage})`);
+
+        // Update URL
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('page', page);
+        window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`);
     };
 
     const handleTablePageSizeChange = (pageSize) => {
-        setTablePageSize(pageSize);
+        console.log(`📏 Page size change requested: ${pageSize}`);
+        
+        // CRITICAL FIX: Set flag BEFORE any state changes
+        isChangingPageSizeRef.current = true;
+        
+        // Reset to page 1
+        lastPageRef.current = 1;
         setTablePage(1);
+        setTablePageSize(pageSize);
+        
         // Update URL
         const urlParams = new URLSearchParams(window.location.search);
         urlParams.set('pageSize', pageSize);
-        urlParams.set('page', 1);
-        window.history.pushState({}, '', `${window.location.pathname}?${urlParams.toString()}`);
+        urlParams.set('page', '1');
+        window.history.pushState({}, '', `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`);
     };
 
     const handleTableSortChange = (sort) => {
@@ -516,35 +481,28 @@ const VehicleList = () => {
     return (
         <Provider spritemap={spritemap}>
             <div className="vehicle-list-container" dir={direction}>
+            <div className="vehicle-table-container" >
                 {/* Page Header */}
+
                 <div className="vehicle-list-header">
                     <div className="header-titles">
                         <h2 className="sub-title">{currentLanguage === 'ar-SA' ? 'إدارة النقل' : 'Transport Management'}</h2>
                         <h1 className="main-title">{currentLanguage === 'ar-SA' ? 'المركبات' : 'Vehicles'}</h1>
                     </div>
+                    <Button
+                        btnStyle="btn-main-primary"
+                        onClick={handleCreateVehicle}
+                        className="create-vehicle-btn"
+                    >
+                        <ClayIcon symbol="plus" className="mr-2" spritemap={spritemap} />
+                        {currentLanguage === 'ar-SA' ? 'انشاء مركبة جديدة' : 'Create New Vehicle'}
+                    </Button>
                 </div>
 
                 {/* Action Bar */}
                 <div className="vehicle-list-actions">
-                    <div className="actions-left">
-                        <Button
-                            btnStyle="btn-main-primary"
-                            onClick={handleCreateVehicle}
-                            className="create-vehicle-btn"
-                        >
-                            <ClayIcon symbol="plus" className="mr-2" spritemap={spritemap} />
-                            {currentLanguage === 'ar-SA' ? 'انشاء مركبة جديدة' : 'Create New Vehicle'}
-                        </Button>
-                        <Button
-                            btnStyle="btn-main-secondary"
-                            onClick={handleFilterClick}
-                            className="filter-btn"
-                        >
-                            <ClayIcon symbol="filter" className="mr-2" spritemap={spritemap} />
-                            {currentLanguage === 'ar-SA' ? 'تصفية' : 'Filter'}
-                        </Button>
-                    </div>
-                    <div className="actions-right">
+                    <div className="actions-grid">
+
                         <SearchInput
                             value={searchValue}
                             onChange={(e) => {
@@ -552,13 +510,23 @@ const VehicleList = () => {
                             onSearch={(value) => {
                                 // This is called after debounce delay - only update searchValue here
                                 setSearchValue(value);
-                                setTablePage(1); // Reset to page 1 when search changes
+                                // Reset to page 1 when search changes
+                                lastPageRef.current = 1;
+                                setTablePage(1);
                             }}
                             debounceDelay={2000}
                             searchWord="search"
                             placeholder={currentLanguage === 'ar-SA' ? 'ابحث هنا' : 'Search here'}
                             spritemap={spritemap}
                         />
+                    <Button
+                        btnStyle="btn-main-secondary"
+                        onClick={handleFilterClick}
+                        className="filter-btn"
+                    >
+                        <ClayIcon symbol="filter" className="mr-2" spritemap={spritemap} />
+                        {currentLanguage === 'ar-SA' ? 'تصفية' : 'Filter'}
+                    </Button>
                     </div>
                 </div>
 
@@ -567,8 +535,8 @@ const VehicleList = () => {
                     <Table
                         items={filteredVehicles}
                         columns={vehicleColumns}
-                        page={tablePage || 1}
-                        pageSize={tablePageSize || 2}
+                        page={tablePage}
+                        pageSize={tablePageSize }
                         onPageChange={handleTablePageChange}
                         onPageSizeChange={handleTablePageSizeChange}
                         onSortChange={handleTableSortChange}
@@ -613,6 +581,7 @@ const VehicleList = () => {
                     hideProgressBar={false}
                     rtl={direction === 'rtl'}
                 />
+            </div>
             </div>
         </Provider>
     );

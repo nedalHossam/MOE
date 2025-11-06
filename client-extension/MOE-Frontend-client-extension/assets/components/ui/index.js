@@ -19,4 +19,5 @@ export { default as SuccessPopup } from './SuccessPopup';
 export { default as Table } from './Table';
 export { default as Textarea } from './Textarea';
 export { default as TextInput } from './TextInput';
+export { default as YearPicker } from './YearPicker';
 

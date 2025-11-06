@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ClayIcon from "@clayui/icon";
 import { getPicklistOptions } from "../../hooks/api";
-import { SelectComponent, DatePicker } from "../../../../components/ui";
+import { SelectComponent, DatePicker, YearPicker } from "../../../../components/ui";
 
 const FilterForm = ({ onFilter, onClose, currentLanguage, direction, spritemap }) => {
     const [filters, setFilters] = useState({
@@ -222,7 +222,7 @@ const FilterForm = ({ onFilter, onClose, currentLanguage, direction, spritemap }
                     <label className="filter-label">{yearText}</label>
                     <div className="filter-date-grid">
                         <div className="filter-date-item">
-                            <DatePicker
+                            <YearPicker
                                 value={filters.yearFrom}
                                 onChange={(value) => handleChange('yearFrom', value || '')}
                                 placeholder={fromText}
@@ -231,11 +231,10 @@ const FilterForm = ({ onFilter, onClose, currentLanguage, direction, spritemap }
                                     start: 1900,
                                     end: 2100
                                 }}
-                                dateFormat="YYYY"
                             />
                         </div>
                         <div className="filter-date-item">
-                            <DatePicker
+                            <YearPicker
                                 value={filters.yearTo}
                                 onChange={(value) => handleChange('yearTo', value || '')}
                                 placeholder={toText}
@@ -244,7 +243,6 @@ const FilterForm = ({ onFilter, onClose, currentLanguage, direction, spritemap }
                                     start: 1900,
                                     end: 2100
                                 }}
-                                dateFormat="YYYY"
                             />
                         </div>
                     </div>

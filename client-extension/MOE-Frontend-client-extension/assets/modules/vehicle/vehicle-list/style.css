@@ -5,6 +5,11 @@
     min-height: 100vh;
     direction: rtl;
 }
+.vehicle-table-container{
+    padding: 30px 20px;
+    background-color: white;
+    border-radius: 21px;
+}
 
 [dir="ltr"] .vehicle-list-container {
     direction: ltr;
@@ -22,11 +27,15 @@
 
 /* Page Header */
 .vehicle-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 24px;
+    gap: 16px;
 }
 
 .header-titles {
-    margin-bottom: 16px;
+    margin-bottom: 0;
 }
 
 .header-titles .sub-title {
@@ -47,27 +56,14 @@
 
 /* Action Bar */
 .vehicle-list-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 16px;
     margin-bottom: 24px;
-    flex-wrap: wrap;
 }
 
-.actions-left {
-    display: flex;
+.actions-grid {
+    display: grid;
+    grid-template-columns: 1fr auto;
     gap: 12px;
     align-items: center;
-    flex-wrap: wrap;
-}
-
-.actions-right {
-    display: flex;
-    align-items: center;
-    flex: 1;
-    max-width: 400px;
-    min-width: 250px;
 }
 
 /* Create Vehicle Button */
@@ -85,6 +81,8 @@
     font-size: 14px;
     transition: all 0.2s ease;
     white-space: nowrap;
+    width:auto;
+     margin-top: 1rem;
 }
 
 .create-vehicle-btn:hover:not(:disabled) {
@@ -92,6 +90,7 @@
     border-color: #7c3aed;
     transform: translateY(-1px);
     box-shadow: 0 4px 8px rgba(139, 92, 246, 0.3);
+    color:white
 }
 
 .create-vehicle-btn:active:not(:disabled) {
@@ -119,6 +118,7 @@
     font-size: 14px;
     transition: all 0.2s ease;
     white-space: nowrap;
+
 }
 
 .filter-btn:hover:not(:disabled) {
@@ -133,7 +133,7 @@
 }
 
 /* Search Input Wrapper */
-.actions-right .search-input-wrapper {
+.actions-grid .search-input-wrapper {
     width: 100%;
 }
 
@@ -141,7 +141,6 @@
 .vehicle-list-table-container {
     background-color: white;
     border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     overflow: hidden;
 }
 
@@ -164,6 +163,22 @@
     color: #272833;
     padding: 16px;
     border-bottom: 2px solid #e7e7ed;
+    border-right: none !important;
+    border-left: none !important;
+    border-top: none !important;
+}
+
+.vehicle-list-table-container .table-header-cell:not(:last-child) {
+    border-right: none !important;
+}
+
+/* Remove all vertical borders from table header cells */
+.vehicle-list-table-container .table-header th,
+.vehicle-list-table-container .table-header td,
+.vehicle-list-table-container .clay-table thead th,
+.vehicle-list-table-container .clay-table thead td {
+    border-right: none !important;
+    border-left: none !important;
 }
 
 .vehicle-list-table-container .table-row {
@@ -275,9 +290,8 @@
 
 /* Pagination Container */
 .vehicle-list-table-container .pagination-container {
-    padding: 16px 24px;
-    background-color: #f7f8f9;
-    border-top: 1px solid #e7e7ed;
+    background-color: #fff;
+    border-top: 0px solid #e7e7ed;
 }
 
 /* Responsive Design */
@@ -287,17 +301,12 @@
     }
 
     .vehicle-list-actions {
-        flex-direction: column;
-        align-items: stretch;
+        margin-bottom: 16px;
     }
 
-    .actions-left {
-        flex-direction: column;
-        width: 100%;
-    }
-
-    .actions-right {
-        max-width: 100%;
+    .actions-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
     }
 
     .create-vehicle-btn,
@@ -364,10 +373,10 @@
 
 .filter-sidebar-header {
     display: flex;
-    align-items: center;
-    padding: 20px;
+    justify-content: space-between;
+    padding: 10px;
     border-bottom: 1px solid #e7e7ed;
-    background-color: #f7f8f9;
+    background-color: #fff;
 }
 
 .filter-close-btn {
@@ -382,11 +391,11 @@
     transition: all 0.2s ease;
     border-radius: 4px;
     margin-right: 12px;
+    width:33px
 }
 
 [dir="ltr"] .filter-close-btn {
     margin-right: 0;
-    margin-left: 12px;
 }
 
 .filter-close-btn:hover {
@@ -418,12 +427,14 @@
 
 .filter-label {
     display: block;
-    margin-bottom: 8px;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 600;
     color: #272833;
 }
-
+.input-group .input-group-inset-item .btn
+{
+    color: var(--primary-main) !important;
+}
 .filter-select {
     width: 100%;
     padding: 10px 12px;
