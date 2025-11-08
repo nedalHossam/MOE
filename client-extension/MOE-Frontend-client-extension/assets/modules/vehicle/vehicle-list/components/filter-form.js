@@ -3,7 +3,7 @@ import ClayIcon from "@clayui/icon";
 import { getPicklistOptions } from "../../hooks/api";
 import { SelectComponent, DatePicker, YearPicker } from "../../../../components/ui";
 
-const FilterForm = ({ onFilter, onClose, currentLanguage, direction, spritemap }) => {
+const FilterForm = ({ t, onFilter, onClose, currentLanguage, direction, spritemap }) => {
     const [filters, setFilters] = useState({
         status: '',
         brand: '',
@@ -99,20 +99,20 @@ const FilterForm = ({ onFilter, onClose, currentLanguage, direction, spritemap }
     };
 
 
-    const filterText = currentLanguage === 'ar-SA' ? 'تصفية' : 'Filter';
-    const resetText = currentLanguage === 'ar-SA' ? 'اعادة' : 'Reset';
-    const classificationText = currentLanguage === 'ar-SA' ? 'تصنيف' : 'Classification';
-    const statusText = currentLanguage === 'ar-SA' ? 'الحالة' : 'Status';
-    const brandText = currentLanguage === 'ar-SA' ? 'علامة تجارية' : 'Brand';
-    const modelText = currentLanguage === 'ar-SA' ? 'طراز' : 'Model';
-    const categoryText = currentLanguage === 'ar-SA' ? 'فئة' : 'Category';
-    const locationText = currentLanguage === 'ar-SA' ? 'موقع' : 'Location';
-    const yearText = currentLanguage === 'ar-SA' ? 'السنة' : 'Year';
-    const registrationExpiryText = currentLanguage === 'ar-SA' ? 'تاريخ انتهاء التسجيل' : 'Registration Expiry Date';
-    const insuranceExpiryText = currentLanguage === 'ar-SA' ? 'تاريخ انتهاء التأمين' : 'Insurance Expiry Date';
-    const departmentText = currentLanguage === 'ar-SA' ? 'القسم' : 'Department';
-    const fromText = currentLanguage === 'ar-SA' ? 'من' : 'From';
-    const toText = currentLanguage === 'ar-SA' ? 'الي' : 'To';
+    const filterText = t?.('filter') || (currentLanguage === 'ar-SA' ? 'تصفية' : 'Filter');
+    const resetText = t?.('reset') || (currentLanguage === 'ar-SA' ? 'إعادة' : 'Reset');
+    const classificationText = t?.('vehicleListFilterTitle') || (currentLanguage === 'ar-SA' ? 'تصنيف' : 'Classification');
+    const statusText = t?.('status') || (currentLanguage === 'ar-SA' ? 'الحالة' : 'Status');
+    const brandText = t?.('carBrand') || (currentLanguage === 'ar-SA' ? 'علامة تجارية' : 'Brand');
+    const modelText = t?.('carModel') || (currentLanguage === 'ar-SA' ? 'طراز' : 'Model');
+    const categoryText = t?.('carCategory') || (currentLanguage === 'ar-SA' ? 'فئة' : 'Category');
+    const locationText = t?.('currentLocation') || (currentLanguage === 'ar-SA' ? 'موقع' : 'Location');
+    const yearText = t?.('yearLabel') || (currentLanguage === 'ar-SA' ? 'السنة' : 'Year');
+    const registrationExpiryText = t?.('registrationExpiryDate') || (currentLanguage === 'ar-SA' ? 'تاريخ انتهاء التسجيل' : 'Registration Expiry Date');
+    const insuranceExpiryText = t?.('insuranceExpiryDate') || (currentLanguage === 'ar-SA' ? 'تاريخ انتهاء التأمين' : 'Insurance Expiry Date');
+    const departmentText = t?.('department') || (currentLanguage === 'ar-SA' ? 'القسم' : 'Department');
+    const fromText = t?.('from') || (currentLanguage === 'ar-SA' ? 'من' : 'From');
+    const toText = t?.('to') || (currentLanguage === 'ar-SA' ? 'إلى' : 'To');
 
     if (loading) {
         return (
@@ -124,7 +124,7 @@ const FilterForm = ({ onFilter, onClose, currentLanguage, direction, spritemap }
                     <h3 className="filter-sidebar-title">{classificationText}</h3>
                 </div>
                 <div className="filter-sidebar-content">
-                    <p>{currentLanguage === 'ar-SA' ? 'جاري التحميل...' : 'Loading...'}</p>
+                    <p>{t?.('loading') || (currentLanguage === 'ar-SA' ? 'جاري التحميل...' : 'Loading...')}</p>
                 </div>
             </div>
         );

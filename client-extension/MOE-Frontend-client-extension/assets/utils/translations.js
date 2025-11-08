@@ -173,6 +173,29 @@ export const translations = {
     submitting: 'Submitting...',
     back: 'Back',
 
+    // Vehicle List
+    transportManagement: 'Transport Management',
+    vehicles: 'Vehicles',
+    createNewVehicle: 'Create New Vehicle',
+    vehicleListSearchPlaceholder: 'Search here',
+    vehicleListFilterTitle: 'Filters',
+    filter: 'Filter',
+    reset: 'Reset',
+    vehicleDetails: 'Vehicle Details',
+    editVehicle: 'Edit Vehicle',
+    viewingVehicleDetails: 'Viewing details for vehicle',
+    vehicleNumberLabel: 'Vehicle Number',
+    makeModelLabel: 'Make / Model',
+    yearLabel: 'Year',
+    numberOfSeatsLabel: 'Number of Seats',
+    kilometersLabel: 'Kilometers',
+    vehicleLocationLabel: 'Vehicle Location',
+    kmUnit: 'km',
+    seatsUnit: 'Seats',
+    from: 'From',
+    to: 'To',
+    expiringSoon: 'Expiring Soon',
+
     // Vehicle Form Translations
     // Form Title
     addNewVehicle: 'Add New Vehicle',
@@ -517,6 +540,29 @@ export const translations = {
     updating: 'جاري التحديث...',
     submitting: 'جاري الإرسال...',
     back: 'رجوع',
+
+    // Vehicle List
+    transportManagement: 'إدارة النقل',
+    vehicles: 'المركبات',
+    createNewVehicle: 'إنشاء مركبة جديدة',
+    vehicleListSearchPlaceholder: 'ابحث هنا',
+    vehicleListFilterTitle: 'التصنيف',
+    filter: 'تصفية',
+    reset: 'إعادة',
+    vehicleDetails: 'تفاصيل المركبة',
+    editVehicle: 'تعديل المركبة',
+    viewingVehicleDetails: 'عرض تفاصيل المركبة',
+    vehicleNumberLabel: 'رقم المركبة',
+    makeModelLabel: 'الماركة / الطراز',
+    yearLabel: 'السنة',
+    numberOfSeatsLabel: 'عدد المقاعد',
+    kilometersLabel: 'الكيلومترات',
+    vehicleLocationLabel: 'موقع المركبة',
+    kmUnit: 'كيلومتر',
+    seatsUnit: 'مقاعد',
+    from: 'من',
+    to: 'إلى',
+    expiringSoon: 'سينتهي قريباً',
 
     // Vehicle Form Translations
     // Form Title

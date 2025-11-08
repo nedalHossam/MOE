@@ -30,8 +30,8 @@ const VehicleList = () => {
         const pageSizeParam = urlParams.get('pageSize');
         const initialPageSize = pageSizeParam ? (() => {
             const pageSizeNum = parseInt(pageSizeParam, 10);
-            return !isNaN(pageSizeNum) && pageSizeNum > 0 ? pageSizeNum : 5;
-        })() : 5;
+            return !isNaN(pageSizeNum) && pageSizeNum > 0 ? pageSizeNum : 10;
+        })() : 10;
         
         // Get search from URL
         const searchParam = urlParams.get('search');
@@ -134,7 +134,7 @@ const VehicleList = () => {
                     setPageSize(pageSizeNum);
                 }
             } else {
-                setPageSize(5);
+                setPageSize(10);
             }
         };
 
@@ -224,14 +224,51 @@ const VehicleList = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchValue, tableSort, filters, page, pageSize]);
 
+    const getLanguageKey = (lang) => (lang === 'ar-SA' ? 'ar_SA' : 'en_US');
+
+    const extractDisplayValue = (value) => {
+        if (!value) return "";
+        if (typeof value === "string") return value;
+        if (typeof value === "object") {
+            return value.name || value.label || value.title || value.value || value.key || "";
+        }
+        return "";
+    };
+
     // Helper function to get localized value from i18n object
     const getLocalizedValue = (field, currentLang = currentLanguage) => {
         if (!field) return "";
 
+        const langKey = getLanguageKey(currentLang);
+
         // If it's an object with i18n property
         if (field.i18n && typeof field.i18n === 'object') {
-            const langKey = currentLang === 'ar-SA' ? 'ar_SA' : 'en_US';
-            return field.i18n[langKey] || field.name || field.key || "";
+            const localizedEntry =
+                field.i18n[langKey] ||
+                (field.defaultLanguageId && field.i18n[field.defaultLanguageId]) ||
+                field.i18n.en_US ||
+                field.i18n.ar_SA ||
+                field.i18n[currentLang];
+
+            const localizedValue = extractDisplayValue(localizedEntry);
+            if (localizedValue) {
+                return localizedValue;
+            }
+        }
+
+        // If it's a map of locales
+        if (typeof field === 'object') {
+            const localizedEntry =
+                field[langKey] ||
+                field[currentLang] ||
+                (field.defaultLanguageId && field[field.defaultLanguageId]) ||
+                field.en_US ||
+                field.ar_SA;
+
+            const localizedValue = extractDisplayValue(localizedEntry);
+            if (localizedValue) {
+                return localizedValue;
+            }
         }
 
         // If it's an object with name property
@@ -252,6 +289,29 @@ const VehicleList = () => {
         return "";
     };
 
+    const getLocalizedFieldValue = (record, fieldName, currentLang = currentLanguage) => {
+        if (!record || !fieldName) return "";
+
+        const langKey = getLanguageKey(currentLang);
+        const localizedMap = record[`${fieldName}_i18n`];
+
+        if (localizedMap && typeof localizedMap === "object") {
+            const localizedEntry =
+                localizedMap[langKey] ||
+                localizedMap[currentLang] ||
+                (record.defaultLanguageId && localizedMap[record.defaultLanguageId]) ||
+                localizedMap.en_US ||
+                localizedMap.ar_SA;
+
+            const localizedValue = extractDisplayValue(localizedEntry);
+            if (localizedValue) {
+                return localizedValue;
+            }
+        }
+
+        return getLocalizedValue(record[fieldName], currentLang);
+    };
+
     // Helper function to format date
     const formatDate = (dateString) => {
         if (!dateString) return "";
@@ -269,14 +329,12 @@ const VehicleList = () => {
 
     // Helper function to format kilometers
     const formatKilometers = (km) => {
-        if (!km) return "";
+        if (!km && km !== 0) return "";
         const numKm = typeof km === 'number' ? km : parseInt(km, 10);
         if (isNaN(numKm)) return "";
-        // Format with Arabic-Indic numerals if Arabic, otherwise use Western numerals
-        if (currentLanguage === 'ar-SA') {
-            return numKm.toLocaleString('ar-SA') + ' كيلومتر';
-        }
-        return numKm.toLocaleString('en-US') + ' km';
+        const locale = currentLanguage === 'ar-SA' ? 'ar-SA' : 'en-US';
+        const unit = t('kmUnit') || (currentLanguage === 'ar-SA' ? 'كيلومتر' : 'km');
+        return `${numKm.toLocaleString(locale)} ${unit}`;
     };
 
     // Helper function to format seats
@@ -284,10 +342,8 @@ const VehicleList = () => {
         if (!seats) return "";
         const numSeats = typeof seats === 'number' ? seats : parseInt(seats, 10);
         if (isNaN(numSeats)) return "";
-        if (currentLanguage === 'ar-SA') {
-            return numSeats + ' مقاعد';
-        }
-        return numSeats + ' Seats';
+        const unit = t('seatsUnit') || (currentLanguage === 'ar-SA' ? 'مقاعد' : 'Seats');
+        return `${numSeats} ${unit}`;
     };
 
     // Map API vehicle data to table row format
@@ -300,22 +356,30 @@ const VehicleList = () => {
                 id: vehicle.id || index,
                 vehicleNumber: vehicleNumber,
                 plateNumber: vehicle.plateNumber || "",
-                brandModel: vehicle.carBrand && vehicle.carModel
-                    ? `${getLocalizedValue(vehicle.carBrand)} ${getLocalizedValue(vehicle.carModel)}`
-                    : getLocalizedValue(vehicle.carBrand) || getLocalizedValue(vehicle.carModel) || "",
+                brandModel: (() => {
+                    const brand = getLocalizedFieldValue(vehicle, 'carBrand');
+                    const model = getLocalizedFieldValue(vehicle, 'carModel');
+                    if (brand && model) {
+                        return `${brand} ${model}`;
+                    }
+                    return brand || model || "";
+                })(),
                 year: vehicle.carYear || "",
-                category: getLocalizedValue(vehicle.carCategory) || "",
+                category: getLocalizedFieldValue(vehicle, 'carCategory') || "",
                 seats: formatSeats(vehicle.licensedCapacitySeats),
                 registrationNumber: vehicle.registrationNumber || "",
                 insuranceExpiryDate: formatDate(vehicle.insuranceExpiryDate),
                 kilometers: formatKilometers(vehicle.currentKM || vehicle.startingKM),
-                location: getLocalizedValue(vehicle.currentLocation) || getLocalizedValue(vehicle.carLocationHome) || "",
-                status: getLocalizedValue(vehicle.vehicleStatus) || "Active",
+                location:
+                    getLocalizedFieldValue(vehicle, 'currentLocation') ||
+                    getLocalizedFieldValue(vehicle, 'carLocationHome') ||
+                    "",
+                status: getLocalizedFieldValue(vehicle, 'vehicleStatus') || t('active') || "Active",
                 // Store original vehicle for actions
                 originalVehicle: vehicle
             };
         });
-    }, [vehicles, currentLanguage]);
+    }, [vehicles, currentLanguage, t]);
 
     // Use mapped vehicles directly (filtering is done server-side)
     // Only filter client-side if needed for additional local filtering
@@ -325,8 +389,8 @@ const VehicleList = () => {
 
     // Table columns configuration
     const vehicleColumns = useMemo(() => {
-        return getVehicleColumns(currentLanguage, spritemap);
-    }, [currentLanguage, spritemap]);
+        return getVehicleColumns({ t, currentLanguage, spritemap });
+    }, [t, currentLanguage, spritemap]);
 
     // Table event handlers
     const handleTableSortChange = (sort) => {
@@ -366,7 +430,7 @@ const VehicleList = () => {
         
         // Update URL with pageSize parameter
         const urlParams = new URLSearchParams(window.location.search);
-        if (newPageSize !== 5) {
+        if (newPageSize !== 10) {
             urlParams.set('pageSize', newPageSize.toString());
         } else {
             urlParams.delete('pageSize');
@@ -380,7 +444,10 @@ const VehicleList = () => {
         const vehicle = row.originalVehicle;
         if (action === 'details') {
             // Navigate to vehicle details page or open modal
-            toast.info(currentLanguage === 'ar-SA' ? 'عرض تفاصيل المركبة' : `Viewing details for vehicle: ${row.brandModel}`);
+            const message = row.brandModel
+                ? `${t('viewingVehicleDetails')}: ${row.brandModel}`
+                : t('viewingVehicleDetails');
+            toast.info(message);
         } else if (action === 'edit') {
             // Navigate to vehicle edit page
             const editUrl = `/vehicle-add-form-reactjs?vehicleId=${vehicle.id}`;
@@ -390,7 +457,7 @@ const VehicleList = () => {
 
     const handleCreateVehicle = () => {
         // Navigate to vehicle add form
-        window.location.href = '/vehicle-add-form-reactjs';
+        window.location.href = '/vehicle-management';
     };
 
     const handleFilterClick = () => {
@@ -410,11 +477,11 @@ const VehicleList = () => {
     const actions = [
         {
             key: 'details',
-            label: currentLanguage === 'ar-SA' ? 'تفاصيل المركبة' : 'Vehicle Details'
+            label: t('vehicleDetails') || (currentLanguage === 'ar-SA' ? 'تفاصيل المركبة' : 'Vehicle Details')
         },
         {
             key: 'edit',
-            label: currentLanguage === 'ar-SA' ? 'تعديل المركبة' : 'Edit Vehicle'
+            label: t('editVehicle') || (currentLanguage === 'ar-SA' ? 'تعديل المركبة' : 'Edit Vehicle')
         }
     ];
 
@@ -423,7 +490,7 @@ const VehicleList = () => {
             <Provider spritemap={spritemap}>
                 <div className="vehicle-list-container" dir={direction}>
                     <div className="loading-container">
-                        <p>{currentLanguage === 'ar-SA' ? 'جاري التحميل...' : 'Loading...'}</p>
+                        <p>{t('loading') || (currentLanguage === 'ar-SA' ? 'جاري التحميل...' : 'Loading...')}</p>
                     </div>
                 </div>
             </Provider>
@@ -438,8 +505,8 @@ const VehicleList = () => {
 
                 <div className="vehicle-list-header">
                     <div className="header-titles">
-                        <h2 className="sub-title">{currentLanguage === 'ar-SA' ? 'إدارة النقل' : 'Transport Management'}</h2>
-                        <h1 className="main-title">{currentLanguage === 'ar-SA' ? 'المركبات' : 'Vehicles'}</h1>
+                        <h2 className="sub-title">{t('transportManagement') || (currentLanguage === 'ar-SA' ? 'إدارة النقل' : 'Transport Management')}</h2>
+                        <h1 className="main-title">{t('vehicles') || (currentLanguage === 'ar-SA' ? 'المركبات' : 'Vehicles')}</h1>
                     </div>
                     <Button
                         btnStyle="btn-main-primary"
@@ -447,7 +514,7 @@ const VehicleList = () => {
                         className="create-vehicle-btn"
                     >
                         <ClayIcon symbol="plus" className="mr-2" spritemap={spritemap} />
-                        {currentLanguage === 'ar-SA' ? 'انشاء مركبة جديدة' : 'Create New Vehicle'}
+                        {t('createNewVehicle') || (currentLanguage === 'ar-SA' ? 'انشاء مركبة جديدة' : 'Create New Vehicle')}
                     </Button>
                 </div>
 
@@ -463,9 +530,9 @@ const VehicleList = () => {
                                 // This is called after debounce delay - only update searchValue here
                                 setSearchValue(value);
                             }}
-                            debounceDelay={2000}
+                            debounceDelay={1000}
                             searchWord="search"
-                            placeholder={currentLanguage === 'ar-SA' ? 'ابحث هنا' : 'Search here'}
+                            placeholder={t('vehicleListSearchPlaceholder') || (currentLanguage === 'ar-SA' ? 'ابحث هنا' : 'Search here')}
                             spritemap={spritemap}
                         />
                     <Button
@@ -474,7 +541,7 @@ const VehicleList = () => {
                         className="filter-btn"
                     >
                         <ClayIcon symbol="filter" className="mr-2" spritemap={spritemap} />
-                        {currentLanguage === 'ar-SA' ? 'تصفية' : 'Filter'}
+                        {t('filter') || (currentLanguage === 'ar-SA' ? 'تصفية' : 'Filter')}
                     </Button>
                     </div>
                 </div>
@@ -489,6 +556,7 @@ const VehicleList = () => {
                         onRowAction={handleRowAction}
                         showActions={true}
                         actions={actions}
+                        actionsLabel={t('actions') || (currentLanguage === 'ar-SA' ? 'الإجراءات' : 'Actions')}
                         spritemap={spritemap}
                         page={page}
                         pageSize={pageSize}
@@ -511,6 +579,7 @@ const VehicleList = () => {
                     <FilterForm
                         onFilter={handleFilterApply}
                         onClose={handleFilterClose}
+                        t={t}
                         currentLanguage={currentLanguage}
                         direction={direction}
                         spritemap={spritemap}

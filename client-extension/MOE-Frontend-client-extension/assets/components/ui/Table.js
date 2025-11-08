@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import {Body, Cell, Text, Head, Row, Table as ClayTable, Provider} from '@clayui/core';
 import { ClayModalProvider } from '@clayui/modal';
 import  { ClayIconSpriteContext } from '@clayui/icon';
@@ -40,6 +40,7 @@ export default function Table({
     onRowAction,
     sort: controlledSort,
     onSortChange,
+    actionsLabel = 'Actions',
 }) {
     // Ensure spritemap is properly formatted
     const finalSpritemap = spritemap || '/o/classic-theme/images/lexicon/icons.svg';
@@ -50,6 +51,53 @@ export default function Table({
     const [internalPage, setInternalPage] = useState(1);
     const [internalPageSize, setInternalPageSize] = useState(10);
     const [showContextMenu, setShowContextMenu] = useState(null);
+    const [activeRow, setActiveRow] = useState(null);
+    const [isMobileView, setIsMobileView] = useState(false);
+    useEffect(() => {
+        if (typeof window === 'undefined') {
+            return;
+        }
+
+        const mediaQuery = window.matchMedia('(max-width: 768px)');
+        const updateIsMobile = (event) => {
+            setIsMobileView(event.matches);
+        };
+
+        setIsMobileView(mediaQuery.matches);
+        mediaQuery.addEventListener('change', updateIsMobile);
+
+        return () => {
+            mediaQuery.removeEventListener('change', updateIsMobile);
+        };
+    }, []);
+
+    useEffect(() => {
+        if (!showContextMenu) {
+            return;
+        }
+
+        const handleKeyDown = (event) => {
+            if (event.key === 'Escape') {
+                closeContextMenu();
+            }
+        };
+
+        document.addEventListener('keydown', handleKeyDown);
+
+        return () => {
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [showContextMenu]);
+
+    const docDirection = typeof document !== 'undefined'
+        ? document.documentElement.getAttribute('dir') || 'ltr'
+        : 'ltr';
+
+    const closeContextMenu = () => {
+        setShowContextMenu(null);
+        setActiveRow(null);
+    };
+
 
     const sort = controlledSort !== undefined ? controlledSort : internalSort;
     
@@ -133,15 +181,23 @@ export default function Table({
         {label: 50},
     ];
 
-    const handleContextMenu = (event, rowId) => {
+    const handleContextMenu = (event, rowData, rowId) => {
         event.preventDefault();
-        setShowContextMenu(showContextMenu === rowId ? null : rowId);
+        event.stopPropagation();
+
+        if (showContextMenu === rowId) {
+            closeContextMenu();
+        } else {
+            setShowContextMenu(rowId);
+            setActiveRow(rowData);
+        }
     };
 
     const handleRowAction = (action, row) => {
-        setShowContextMenu(null);
-        if (onRowAction) {
-            onRowAction(action, row);
+        const targetRow = row || activeRow;
+        closeContextMenu();
+        if (onRowAction && targetRow) {
+            onRowAction(action, targetRow);
         }
     };
 
@@ -171,7 +227,7 @@ export default function Table({
                             ))}
                             {showActions && (
                                 <Cell className="table-header-cell">
-                                    Actions
+                                    {actionsLabel}
                                 </Cell>
                             )}
                         </Head>
@@ -202,11 +258,11 @@ export default function Table({
                                             <div className="action-cell">
                                                 <button
                                                     className="context-menu-trigger"
-                                                    onClick={(e) => handleContextMenu(e, row.id || index)}
+                                                    onClick={(e) => handleContextMenu(e, row, row.id || index)}
                                                 >
                                                     ⋯
                                                 </button>
-                                                {showContextMenu === (row.id || index) && (
+                                                {showContextMenu === (row.id || index) && !isMobileView && (
                                                     <div className="context-menu">
                                                         {actions.map(action => (
                                                             <button
@@ -227,7 +283,39 @@ export default function Table({
                         </Body>
                     </ClayTable>
                 </div>
-
+                {isMobileView && showContextMenu !== null && activeRow && (
+                    <>
+                        <div
+                            className="mobile-action-overlay"
+                            onClick={closeContextMenu}
+                        />
+                        <div className="mobile-action-menu" dir={docDirection}>
+                            <div className="mobile-action-menu-header">
+                                <span>{actionsLabel}</span>
+                                <button
+                                    type="button"
+                                    className="mobile-action-menu-close"
+                                    onClick={closeContextMenu}
+                                    aria-label="Close actions menu"
+                                >
+                                    ×
+                                </button>
+                            </div>
+                            <div className="mobile-action-menu-content">
+                                {actions.map((action) => (
+                                    <button
+                                        key={action.key}
+                                        type="button"
+                                        className="mobile-action-menu-item"
+                                        onClick={() => handleRowAction(action.key)}
+                                    >
+                                        {action.label}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </>
+                )}
                 {/* Enhanced Pagination - only show if pagination is enabled */}
                 {paginationEnabled && (
                     <div className="pagination-container">
