@@ -14,98 +14,72 @@ import { getVehicleColumns } from "./components/data-columns";
 
 const VehicleList = () => {
     const { t, currentLanguage, direction } = useTranslation();
-    const [vehicles, setVehicles] = useState([]);
-    const [pagination, setPagination] = useState({
-        page: 1,
-        pageSize: 2,
-        lastPage: 1,
-        totalCount: 0
-    });
-    const [loading, setLoading] = useState(true);
-    const [searchValue, setSearchValue] = useState("");
-    const [tablePage, setTablePage] = useState(1);
-    const [tablePageSize, setTablePageSize] = useState(2);
-    const [tableSort, setTableSort] = useState(null);
-    const [showFilter, setShowFilter] = useState(false);
-    const [filters, setFilters] = useState({});
-    const spritemap = `${Liferay.ThemeDisplay.getPathThemeImages()}/clay/icons.svg`;
-    const isInitializedRef = useRef(false);
-    const lastPageRef = useRef(1); // Track the last page to prevent unwanted resets
-    const isChangingPageSizeRef = useRef(false); // Track if we're in the middle of a pageSize change
-
-    // Initialize state from URL parameters on mount and set defaults if missing
-    useEffect(() => {
-        // Prevent re-initialization if already initialized
-        if (isInitializedRef.current) {
-            return;
-        }
+    
+    // Initialize state from URL parameters immediately
+    const getInitialStateFromURL = () => {
         const urlParams = new URLSearchParams(window.location.search);
-        let urlUpdated = false;
-
-        // Initialize search value from URL
-        const searchParam = urlParams.get('search');
-        if (searchParam) {
-            setSearchValue(searchParam);
-        }
-
-        // Initialize page from URL (default: 1)
-        let page = 1;
-        const pageParam = urlParams.get('page');
-        if (pageParam) {
-            const parsedPage = parseInt(pageParam, 10);
-            if (!isNaN(parsedPage) && parsedPage > 0) {
-                page = parsedPage;
-            }
-        } else {
-            // Set default page to 1 in URL if not present
-            urlParams.set('page', '1');
-            urlUpdated = true;
-        }
-
-        // Initialize page size from URL (default: 2)
-        let pageSize = 2;
-        const pageSizeParam = urlParams.get('pageSize');
-        if (pageSizeParam) {
-            const parsedPageSize = parseInt(pageSizeParam, 10);
-            if (!isNaN(parsedPageSize) && parsedPageSize > 0) {
-                pageSize = parsedPageSize;
-            }
-        } else {
-            // Set default pageSize to 2 in URL if not present
-            urlParams.set('pageSize', '2');
-            urlUpdated = true;
-        }
         
-        // Set both page and pageSize together to avoid race conditions
-        setTablePageSize(pageSize);
-        setTablePage(page);
-        lastPageRef.current = page; // Initialize ref
-
-        // Initialize sort from URL using sortBy and sortOrder parameters
+        // Get page from URL, default to 1
+        const pageParam = urlParams.get('page');
+        const initialPage = pageParam ? (() => {
+            const pageNum = parseInt(pageParam, 10);
+            return !isNaN(pageNum) && pageNum > 0 ? pageNum : 1;
+        })() : 1;
+        
+        // Get pageSize from URL, default to 5
+        const pageSizeParam = urlParams.get('pageSize');
+        const initialPageSize = pageSizeParam ? (() => {
+            const pageSizeNum = parseInt(pageSizeParam, 10);
+            return !isNaN(pageSizeNum) && pageSizeNum > 0 ? pageSizeNum : 5;
+        })() : 5;
+        
+        // Get search from URL
+        const searchParam = urlParams.get('search');
+        const initialSearch = searchParam || "";
+        
+        // Get sort from URL
         const sortByParam = urlParams.get('sortBy');
         const sortOrderParam = urlParams.get('sortOrder');
-        if (sortByParam) {
-            setTableSort({
-                column: sortByParam,
-                direction: sortOrderParam || 'ascending'
+        const initialSort = sortByParam ? {
+            column: sortByParam,
+            direction: sortOrderParam || 'ascending'
+        } : null;
+        
+        return {
+            page: initialPage,
+            pageSize: initialPageSize,
+            search: initialSearch,
+            sort: initialSort
+        };
+    };
+    
+    const initialState = getInitialStateFromURL();
+    
+    const [vehicles, setVehicles] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [searchValue, setSearchValue] = useState(initialState.search);
+    const [tableSort, setTableSort] = useState(initialState.sort);
+    const [showFilter, setShowFilter] = useState(false);
+    const [filters, setFilters] = useState({});
+    const [page, setPage] = useState(initialState.page);
+    const [pageSize, setPageSize] = useState(initialState.pageSize);
+    const [totalCount, setTotalCount] = useState(0);
+    const spritemap = `${Liferay.ThemeDisplay.getPathThemeImages()}/clay/icons.svg`;
+    const isInitializedRef = useRef(false);
+
+    // Mark as initialized on mount (state already initialized from URL)
+    useEffect(() => {
+        if (!isInitializedRef.current) {
+            console.log("Component initialized with URL params:", {
+                page,
+                pageSize,
+                search: searchValue,
+                sort: tableSort
             });
+            isInitializedRef.current = true;
         }
-
-        // Update URL with default parameters if they were missing
-        if (urlUpdated) {
-            const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
-            window.history.replaceState({}, '', newUrl);
-        }
-
-        isInitializedRef.current = true;
     }, []);
 
-
-    // Use a ref to track tablePage to avoid stale closures
-    const tablePageRef = useRef(tablePage);
-    useEffect(() => {
-        tablePageRef.current = tablePage;
-    }, [tablePage]);
 
     // Use refs to track sort state to avoid stale closures
     const tableSortRef = useRef(tableSort);
@@ -120,26 +94,15 @@ const VehicleList = () => {
 
         const handlePopState = () => {
             const urlParams = new URLSearchParams(window.location.search);
-            const pageParam = urlParams.get('page');
-            if (pageParam) {
-                const parsedPage = parseInt(pageParam, 10);
-                const currentPage = tablePageRef.current;
-                // Only sync if page is valid and different from current
-                if (!isNaN(parsedPage) && parsedPage > 0 && parsedPage !== currentPage) {
-                    console.log(`Browser navigation detected: syncing page from URL ${parsedPage} (current: ${currentPage})`);
-                    lastPageRef.current = parsedPage;
-                    setTablePage(parsedPage);
-                }
-            }
-            
+
             // Sync sort from URL on browser navigation (using sortBy and sortOrder)
             const sortByParam = urlParams.get('sortBy');
             const sortOrderParam = urlParams.get('sortOrder');
             const currentSort = tableSortRef.current;
             if (sortByParam) {
-                const newSort = { 
-                    column: sortByParam, 
-                    direction: sortOrderParam || 'ascending' 
+                const newSort = {
+                    column: sortByParam,
+                    direction: sortOrderParam || 'ascending'
                 };
                 // Only update if different from current
                 if (!currentSort || currentSort.column !== newSort.column || currentSort.direction !== newSort.direction) {
@@ -150,6 +113,28 @@ const VehicleList = () => {
                 // Clear sort if not in URL
                 console.log(`Browser navigation detected: clearing sort (not in URL)`);
                 setTableSort(null);
+            }
+
+            // Sync page from URL on browser navigation
+            const pageParam = urlParams.get('page');
+            if (pageParam) {
+                const pageNum = parseInt(pageParam, 10);
+                if (!isNaN(pageNum) && pageNum > 0) {
+                    setPage(pageNum);
+                }
+            } else {
+                setPage(1);
+            }
+
+            // Sync pageSize from URL on browser navigation
+            const pageSizeParam = urlParams.get('pageSize');
+            if (pageSizeParam) {
+                const pageSizeNum = parseInt(pageSizeParam, 10);
+                if (!isNaN(pageSizeNum) && pageSizeNum > 0) {
+                    setPageSize(pageSizeNum);
+                }
+            } else {
+                setPageSize(5);
             }
         };
 
@@ -185,7 +170,26 @@ const VehicleList = () => {
         return `${apiField}:${order}`;
     };
 
-    // Fetch vehicle data when page, pageSize, search, or sort changes
+    // Track if this is the first render after initialization
+    const isFirstRenderRef = useRef(true);
+    
+    // Reset to page 1 when search, sort, or filters change (but not on initial mount)
+    useEffect(() => {
+        if (!isInitializedRef.current) {
+            return;
+        }
+        
+        // Skip reset on first render after initialization (to preserve URL page parameter)
+        if (isFirstRenderRef.current) {
+            isFirstRenderRef.current = false;
+            return;
+        }
+        
+        // Reset to page 1 when filters/search/sort change
+        setPage(1);
+    }, [searchValue, tableSort, filters]);
+
+    // Fetch vehicle data when search, sort, filters, page, or pageSize change
     useEffect(() => {
         // Skip if component hasn't initialized yet
         if (!isInitializedRef.current) {
@@ -197,51 +201,20 @@ const VehicleList = () => {
             try {
                 setLoading(true);
                 
-                // CRITICAL FIX: Use lastPageRef for the most up-to-date page value
-                const currentPage = lastPageRef.current;
-                const currentPageSize = tablePageSize || 2;
                 const currentSearch = searchValue || '';
                 const sortParam = getSortParam(tableSort);
                 
-                console.log(`🔄 Fetching: page=${currentPage}, pageSize=${currentPageSize}, isChangingPageSize=${isChangingPageSizeRef.current}`);
+                // Fetch vehicles with current pagination
+                const response = await getVehicleList(page, pageSize, currentSearch, sortParam, filters);
                 
-                const response = await getVehicleList(currentPage, currentPageSize, currentSearch, sortParam, filters);
-                
-                // Extract pagination data from response (handle both response.pagination and top-level properties)
-                const responseLastPage = response?.pagination?.lastPage || response?.lastPage || 1;
-                const responseTotalCount = response?.pagination?.totalCount || response?.totalCount || 0;
-                
-                console.log(`vehicle listttttttt`, response, currentPage, currentPageSize);
+                console.log(`vehicle list`, response);
                 
                 setVehicles(response.items || []);
-                
-                // Always use the REQUESTED page and pageSize, not what the API returns
-                setPagination({
-                    page: currentPage,
-                    pageSize: currentPageSize,
-                    lastPage: responseLastPage,
-                    totalCount: responseTotalCount
-                });
-                
-                // CRITICAL FIX: Only validate if NOT changing page size
-                if (!isChangingPageSizeRef.current && currentPage > responseLastPage && responseLastPage > 0) {
-                    console.log(`⚠️ Page ${currentPage} exceeds lastPage ${responseLastPage}, resetting to ${responseLastPage}`);
-                    lastPageRef.current = responseLastPage;
-                    setTablePage(responseLastPage);
-                    
-                    const urlParams = new URLSearchParams(window.location.search);
-                    urlParams.set('page', responseLastPage);
-                    window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`);
-                }
-                
-                // Reset the flag after fetch completes
-                isChangingPageSizeRef.current = false;
+                setTotalCount(response.pagination?.totalCount || 0);
 
             } catch (error) {
                 console.error("Error fetching vehicles:", error);
                 toast.error(t("failedToFetchVehicles") || "Failed to fetch vehicles");
-                // Reset flag even on error
-                isChangingPageSizeRef.current = false;
             } finally {
                 setLoading(false);
             }
@@ -249,7 +222,7 @@ const VehicleList = () => {
 
         fetchVehicles();
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [tablePage, tablePageSize, searchValue, tableSort, filters]);
+    }, [searchValue, tableSort, filters, page, pageSize]);
 
     // Helper function to get localized value from i18n object
     const getLocalizedValue = (field, currentLang = currentLanguage) => {
@@ -352,56 +325,13 @@ const VehicleList = () => {
 
     // Table columns configuration
     const vehicleColumns = useMemo(() => {
-        return getVehicleColumns(currentLanguage);
-    }, [currentLanguage]);
+        return getVehicleColumns(currentLanguage, spritemap);
+    }, [currentLanguage, spritemap]);
 
     // Table event handlers
-    const handleTablePageChange = (page) => {
-        console.log(`📄 Page change requested: ${page} (current: ${tablePage})`);
-        
-        // Prevent setting to the same page
-        if (page === tablePage) {
-            console.log(`Skipping page change: already on page ${page}`);
-            return;
-        }
-        
-        // Update ref to track intended page BEFORE state update
-        lastPageRef.current = page;
-        
-        // Update state
-        setTablePage(page);
-        console.log(`📄 Page change requested: ${page} (current: ${tablePage})`);
-
-        // Update URL
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('page', page);
-        window.history.replaceState({}, '', `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`);
-    };
-
-    const handleTablePageSizeChange = (pageSize) => {
-        console.log(`📏 Page size change requested: ${pageSize}`);
-        
-        // CRITICAL FIX: Set flag BEFORE any state changes
-        isChangingPageSizeRef.current = true;
-        
-        // Reset to page 1
-        lastPageRef.current = 1;
-        setTablePage(1);
-        setTablePageSize(pageSize);
-        
-        // Update URL
-        const urlParams = new URLSearchParams(window.location.search);
-        urlParams.set('pageSize', pageSize);
-        urlParams.set('page', '1');
-        window.history.pushState({}, '', `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`);
-    };
-
     const handleTableSortChange = (sort) => {
         // Update sort state
         setTableSort(sort);
-        // Reset to page 1 when sort changes
-        setTablePage(1);
-        lastPageRef.current = 1;
         
         // Update URL with sortBy and sortOrder parameters (not sort parameter)
         const urlParams = new URLSearchParams(window.location.search);
@@ -416,8 +346,32 @@ const VehicleList = () => {
             urlParams.delete('sortOrder');
             urlParams.delete('sort');
         }
-        // Reset page to 1 in URL
-        urlParams.set('page', '1');
+        const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+        window.history.replaceState({}, '', newUrl);
+    };
+
+    const handlePageChange = (newPage) => {
+        setPage(newPage);
+        
+        // Update URL with page parameter (always include page in URL for consistency)
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('page', newPage.toString());
+        const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+        window.history.replaceState({}, '', newUrl);
+    };
+
+    const handlePageSizeChange = (newPageSize) => {
+        setPageSize(newPageSize);
+        setPage(1); // Reset to first page when page size changes
+        
+        // Update URL with pageSize parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        if (newPageSize !== 5) {
+            urlParams.set('pageSize', newPageSize.toString());
+        } else {
+            urlParams.delete('pageSize');
+        }
+        urlParams.set('page', '1'); // Reset to page 1 (always include page in URL)
         const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
         window.history.replaceState({}, '', newUrl);
     };
@@ -449,8 +403,6 @@ const VehicleList = () => {
 
     const handleFilterApply = (filterValues) => {
         setFilters(filterValues);
-        setTablePage(1); // Reset to page 1 when filters change
-        lastPageRef.current = 1;
         setShowFilter(false);
     };
 
@@ -510,9 +462,6 @@ const VehicleList = () => {
                             onSearch={(value) => {
                                 // This is called after debounce delay - only update searchValue here
                                 setSearchValue(value);
-                                // Reset to page 1 when search changes
-                                lastPageRef.current = 1;
-                                setTablePage(1);
                             }}
                             debounceDelay={2000}
                             searchWord="search"
@@ -535,23 +484,17 @@ const VehicleList = () => {
                     <Table
                         items={filteredVehicles}
                         columns={vehicleColumns}
-                        page={tablePage}
-                        pageSize={tablePageSize }
-                        onPageChange={handleTablePageChange}
-                        onPageSizeChange={handleTablePageSizeChange}
                         onSortChange={handleTableSortChange}
                         sort={tableSort}
-                        totalItems={pagination.totalCount}
                         onRowAction={handleRowAction}
                         showActions={true}
                         actions={actions}
-                        deltas={[
-                            { label: 5 },
-                            { label: 10 },
-                            { label: 20 },
-                            { label: 50 }
-                        ]}
                         spritemap={spritemap}
+                        page={page}
+                        pageSize={pageSize}
+                        onPageChange={handlePageChange}
+                        onPageSizeChange={handlePageSizeChange}
+                        totalItems={totalCount}
                     />
                 </div>
 

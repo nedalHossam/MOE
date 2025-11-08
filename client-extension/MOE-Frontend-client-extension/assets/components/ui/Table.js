@@ -52,8 +52,18 @@ export default function Table({
     const [showContextMenu, setShowContextMenu] = useState(null);
 
     const sort = controlledSort !== undefined ? controlledSort : internalSort;
-    const page = controlledPage || internalPage;
-    const pageSize = controlledPageSize || internalPageSize;
+    
+    // Determine if pagination should be enabled
+    // Pagination is enabled only if at least one pagination prop is provided
+    const paginationEnabled = controlledPage !== undefined || 
+                               controlledPageSize !== undefined || 
+                               onPageChange !== undefined || 
+                               onPageSizeChange !== undefined ||
+                               totalItems !== undefined;
+    
+    const page = paginationEnabled ? (controlledPage || internalPage) : 1;
+    // When pagination is disabled, use a large number so all items are shown
+    const pageSize = paginationEnabled ? (controlledPageSize || internalPageSize) : 10000;
     const handlePageChange = onPageChange || setInternalPage;
     const handlePageSizeChange = onPageSizeChange || setInternalPageSize;
 
@@ -99,11 +109,22 @@ export default function Table({
         return filtered;
     }, [sort, items]);
 
-    // Pagination logic
+    // Pagination logic - only paginate if pagination is enabled
+    // If totalItems is provided, assume server-side pagination (items are already paginated from server)
+    // In that case, don't slice the items - display them as-is
+    const isServerSidePagination = totalItems !== undefined;
     const pagedItems = useMemo(() => {
+        if (!paginationEnabled) {
+            return filteredItems;
+        }
+        // If server-side pagination, return items as-is (already paginated from server)
+        if (isServerSidePagination) {
+            return filteredItems;
+        }
+        // Otherwise, do client-side pagination
         const start = (page - 1) * pageSize;
         return filteredItems.slice(start, start + pageSize);
-    }, [filteredItems, page, pageSize]);
+    }, [filteredItems, page, pageSize, paginationEnabled, isServerSidePagination]);
 
     const paginationDeltas = deltas || [
         {label: 5},
@@ -207,19 +228,21 @@ export default function Table({
                     </ClayTable>
                 </div>
 
-                {/* Enhanced Pagination */}
-                <div className="pagination-container">
-                    <Pagination
-                        activePage={page}
-                        onPageChange={handlePageChange}
-                        totalPages={Math.ceil((typeof totalItems === 'number' ? totalItems : filteredItems.length) / pageSize)}
-                        totalItems={typeof totalItems === 'number' ? totalItems : filteredItems.length}
-                        activeDelta={pageSize}
-                        deltas={paginationDeltas}
-                        onDeltaChange={handlePageSizeChange}
-                        showItemsPerPage={false}
-                    />
-                </div>
+                {/* Enhanced Pagination - only show if pagination is enabled */}
+                {paginationEnabled && (
+                    <div className="pagination-container">
+                        <Pagination
+                            activePage={page}
+                            onPageChange={handlePageChange}
+                            totalPages={Math.ceil((typeof totalItems === 'number' ? totalItems : filteredItems.length) / pageSize)}
+                            totalItems={typeof totalItems === 'number' ? totalItems : filteredItems.length}
+                            activeDelta={pageSize}
+                            deltas={paginationDeltas}
+                            onDeltaChange={handlePageSizeChange}
+                            showItemsPerPage={false}
+                        />
+                    </div>
+                )}
             </div>
             </ClayModalProvider>
                 </ClayIconSpriteContext.Provider>
